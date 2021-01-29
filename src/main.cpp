@@ -10,6 +10,7 @@
 ConfigWorker cfg;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void window_maximize_callback(GLFWwindow* window, int maximized);
 
 int main() {
     // Load config.
@@ -36,8 +37,12 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window); // Initialize GLEW
+    if (cfg.windowMaximized) {
+        glfwMaximizeWindow(window);
+    }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetWindowMaximizeCallback(window, window_maximize_callback);
 
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -62,4 +67,12 @@ int main() {
 void framebuffer_size_callback(GLFWwindow* window, int fbwidth, int fbheight) {
     glViewport(0, 0, fbwidth, fbheight);
     cfg.saveWindowSize(fbwidth, fbheight);
+}
+
+void window_maximize_callback(GLFWwindow* window, int maximized) {
+    if (maximized) {
+        cfg.saveWindowMaximizedState(true);
+    } else {
+        cfg.saveWindowMaximizedState(false);
+    }
 }

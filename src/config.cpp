@@ -23,8 +23,9 @@ const int saveInterval = 5;
         updated = false;
 
         json j;
-        j["windowWidth"]  = windowWidth;
-        j["windowHeight"] = windowHeight;
+        j["windowWidth"]     = windowWidth;
+        j["windowHeight"]    = windowHeight;
+        j["windowMaximized"] = windowMaximized;
 
         std::ofstream ofs(configfile);
         ofs << std::setw(4) << j.dump(2) << std::endl;
@@ -37,8 +38,9 @@ void ConfigWorker::load() {
         json j;
         ifs >> j;
 
-        windowWidth  = j["windowWidth"].get<int>();
-        windowHeight = j["windowHeight"].get<int>();
+        windowWidth     = j["windowWidth"].get<int>();
+        windowHeight    = j["windowHeight"].get<int>();
+        windowMaximized = j["windowMaximized"].get<bool>();
     } else {
         std::cerr << "Failed to open config file." << std::endl;
     }
@@ -51,4 +53,9 @@ void ConfigWorker::saveWindowSize(int width, int height) {
     windowWidth  = width;
     windowHeight = height;
     updated      = true;
+}
+
+void ConfigWorker::saveWindowMaximizedState(bool state) {
+    windowMaximized = state;
+    updated         = true;
 }
