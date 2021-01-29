@@ -29,12 +29,14 @@ const int saveInterval = 5;
 
         std::ofstream ofs(configfile);
         ofs << std::setw(4) << j.dump(2) << std::endl;
+        std::cout << "Configuration saved." << std::endl;
     }
 }
 
 void ConfigWorker::load() {
     std::ifstream ifs(configfile);
     if (ifs.good()) {
+        std::cout << "Using " << configfile << " to read application configuration." << std::endl;
         json j;
         ifs >> j;
 
@@ -42,7 +44,7 @@ void ConfigWorker::load() {
         windowHeight    = j["windowHeight"].get<int>();
         windowMaximized = j["windowMaximized"].get<bool>();
     } else {
-        std::cerr << "Failed to open config file." << std::endl;
+        std::cerr << "Failed to open config file, using default settings." << std::endl;
     }
 
     std::thread worker_thread(&ConfigWorker::saveFile, this);

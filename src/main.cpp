@@ -23,10 +23,10 @@ int main() {
         return -1;
     }
 
-    glfwWindowHint(GLFW_SAMPLES, 4);               // 4x antialiasing
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 3.3
+    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
     GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
@@ -49,6 +49,14 @@ int main() {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "All OpenGL systems fired up." << std::endl;
+    std::cout << "------------------------------------------------------------" << std::endl;
+
+    const GLubyte* gpuVendor = glGetString(GL_VENDOR);
+    const GLubyte* gpuModel  = glGetString(GL_RENDERER);
+    std::cout << "Using GPU: " << gpuVendor << " " << gpuModel << std::endl;
 
     // Main rendering loop.
     do {
