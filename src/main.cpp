@@ -5,10 +5,18 @@
 
 #include <GLFW/glfw3.h>
 
-const unsigned int SCR_WIDTH  = 1280;
-const unsigned int SCR_HEIGHT = 720;
+#include "config.h"
+
+ConfigWorker cfg;
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main() {
+    // Load config.
+    cfg = ConfigWorker();
+    cfg.load();
+
+    // Initialize OpenGL.
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW." << std::endl;
         return -1;
@@ -21,13 +29,15 @@ int main() {
 
     // Open a window and create its OpenGL context
     GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hazard", NULL, NULL);
+    window = glfwCreateWindow(cfg.windowWidth, cfg.windowHeight, "Hazard", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to open GLFW window." << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window); // Initialize GLEW
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -47,4 +57,9 @@ int main() {
     glfwTerminate();
 
     return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int fbwidth, int fbheight) {
+    glViewport(0, 0, fbwidth, fbheight);
+    cfg.saveWindowSize(fbwidth, fbheight);
 }

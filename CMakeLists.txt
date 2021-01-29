@@ -11,7 +11,11 @@ project(${PROJECT}
     LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(${PROJECT} src/main.cpp)
+# FIXME: vcpkg dependencies seem to be processed weirdly with my CMake configuration.
+include_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/include)
+link_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/lib)
+
+add_executable(${PROJECT} src/main.cpp src/config.cpp src/config.h)
 
 # Add CMakeLists.txt for 3rd party libs
 add_subdirectory(3rdparty)

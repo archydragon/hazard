@@ -4,3 +4,6 @@ cmake-build-*
 
 # vcpkg artifacts
 vcpkg_installed/
+
+# local environment artifacts
+config.json
