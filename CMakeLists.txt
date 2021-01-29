@@ -5,10 +5,21 @@ set(_VCPKG_INSTALLED_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed)
 set(VCPKG_TARGET_TRIPLET x86-windows)
 
 # Main project configuration
-project(hazard)
+set(PROJECT hazard)
+project(${PROJECT}
+    VERSION 0.1.0
+    LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(hazard main.cpp)
+add_executable(${PROJECT} src/main.cpp)
 
-target_link_libraries(hazard PRIVATE
+# Add CMakeLists.txt for 3rd party libs
+add_subdirectory(3rdparty)
+
+# Libraries bundled under 3rdparty dir
+target_link_libraries(${PROJECT} PRIVATE
+    glad)
+
+# Libraries installed through vcpkg
+target_link_libraries(${PROJECT} PRIVATE
     glfw3)

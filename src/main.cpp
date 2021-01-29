@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <glad/glad.h>
+// glad should be included before glfw3, keep an empty line to distract clang-format
+
 #include <GLFW/glfw3.h>
 
 const unsigned int SCR_WIDTH  = 1280;
@@ -13,7 +16,7 @@ int main() {
 
     glfwWindowHint(GLFW_SAMPLES, 4);               // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 3.3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL
 
     // Open a window and create its OpenGL context
@@ -25,6 +28,21 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window); // Initialize GLEW
+
+    // glad init
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cerr << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    // Main rendering loop.
+    do {
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    } while (glfwWindowShouldClose(window) == 0);
 
     glfwTerminate();
 
