@@ -1,3 +1,6 @@
 # IDE artifacts
 .idea
 cmake-build-*
+
+# vcpkg artifacts
+vcpkg_installed/
