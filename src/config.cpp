@@ -39,12 +39,12 @@ void ConfigWorker::load() {
 
         windowWidth  = j["windowWidth"].get<int>();
         windowHeight = j["windowHeight"].get<int>();
-
-        std::thread worker_thread(&ConfigWorker::saveFile, this);
-        worker_thread.detach();
     } else {
         std::cerr << "Failed to open config file." << std::endl;
     }
+
+    std::thread worker_thread(&ConfigWorker::saveFile, this);
+    worker_thread.detach();
 }
 
 void ConfigWorker::saveWindowSize(int width, int height) {
