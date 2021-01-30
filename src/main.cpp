@@ -59,9 +59,9 @@ int main() {
     std::cout << "All OpenGL systems fired up." << std::endl;
     std::cout << "------------------------------------------------------------" << std::endl;
 
-    const GLubyte* gpuVendor = glGetString(GL_VENDOR);
-    const GLubyte* gpuModel  = glGetString(GL_RENDERER);
-    std::cout << "Using GPU: " << gpuVendor << " " << gpuModel << std::endl;
+    std::cout << "Using GPU: " << glGetString(GL_VENDOR) << " " << glGetString(GL_RENDERER)
+              << std::endl;
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
     // IMGUI
     IMGUI_CHECKVERSION();
