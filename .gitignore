@@ -7,3 +7,4 @@ vcpkg_installed/
 
 # local environment artifacts
 config.json
+imgui.ini

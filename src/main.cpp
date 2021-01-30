@@ -2,8 +2,10 @@
 
 #include <glad/glad.h>
 // glad should be included before glfw3, keep an empty line to distract clang-format
-
 #include <GLFW/glfw3.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
 
 #include "config.h"
 
@@ -41,6 +43,9 @@ int main() {
         glfwMaximizeWindow(window);
     }
 
+    // Enable vsync
+    glfwSwapInterval(1);
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetWindowMaximizeCallback(window, window_maximize_callback);
 
@@ -58,15 +63,43 @@ int main() {
     const GLubyte* gpuModel  = glGetString(GL_RENDERER);
     std::cout << "Using GPU: " << gpuVendor << " " << gpuModel << std::endl;
 
+    // IMGUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsDark();
+    io.Fonts->AddFontFromFileTTF("editor_assets/RobotoMono-Regular.ttf", 18.0f);
+    io.Fonts->Build();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(NULL);
+
     // Main rendering loop.
     do {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        {
+            ImGui::Begin("Debug");
+            ImGui::Text("FPS: %.0f\n%f ms/frame", io.Framerate, 1000.0f / io.Framerate);
+            ImGui::End();
+        }
+
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     } while (glfwWindowShouldClose(window) == 0);
 
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return 0;
