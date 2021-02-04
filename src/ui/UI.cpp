@@ -50,6 +50,8 @@ void UI::initFrame() {
         }
 
         // Camera window.
+        ImGui::SetNextWindowPos(ImVec2(980, 26), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 128), ImGuiCond_FirstUseEver);
         if (ImGui::Begin("Camera", NULL, ImGuiWindowFlags_NoCollapse)) {
             ImGui::Checkbox("Freelook", &cameraFreelook);
             ImGui::SliderFloat3("position", (float*)&camera->position, -20.0f, 20.0f);
