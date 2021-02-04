@@ -12,6 +12,9 @@ using json = nlohmann::json;
 const char* configfile = "config.json";
 const int saveInterval = 5;
 
+// Macros for JSON (de)serialization.
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ConfigWorker, windowWidth, windowHeight, windowMaximized)
+
 [[noreturn]] void ConfigWorker::saveFile() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(saveInterval));
@@ -23,9 +26,7 @@ const int saveInterval = 5;
         updated = false;
 
         json j;
-        j["windowWidth"]     = windowWidth;
-        j["windowHeight"]    = windowHeight;
-        j["windowMaximized"] = windowMaximized;
+        to_json(j, *this);
 
         std::ofstream ofs(configfile);
         ofs << std::setw(4) << j.dump(2) << std::endl;
@@ -39,10 +40,7 @@ void ConfigWorker::load() {
         std::cout << "Using " << configfile << " to read application configuration." << std::endl;
         json j;
         ifs >> j;
-
-        windowWidth     = j["windowWidth"].get<int>();
-        windowHeight    = j["windowHeight"].get<int>();
-        windowMaximized = j["windowMaximized"].get<bool>();
+        from_json(j, *this);
     } else {
         std::cerr << "Failed to open config file, using default settings." << std::endl;
     }
