@@ -4,19 +4,19 @@
 // glad should be included before glfw3, keep an empty line to distract clang-format
 #include <GLFW/glfw3.h>
 
-#include "config.h"
+#include "Config.h"
 #include "engine/Camera.h"
 #include "engine/Scene.h"
 #include "ui/UI.h"
 
-ConfigWorker cfg;
+Config cfg;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void window_maximize_callback(GLFWwindow* window, int maximized);
 
 int main() {
     // Load config.
-    cfg = ConfigWorker();
+    cfg = Config();
     cfg.load();
 
     // Initialize OpenGL.

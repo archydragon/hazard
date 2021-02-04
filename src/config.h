@@ -3,7 +3,7 @@
 #ifndef HAZARD_CONFIG_H
 #define HAZARD_CONFIG_H
 
-class ConfigWorker {
+class Config {
 public:
     // default configuration values
     unsigned int windowWidth  = 1280;

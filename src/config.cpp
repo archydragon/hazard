@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "config.h"
+#include "Config.h"
 
 using json = nlohmann::json;
 
@@ -13,9 +13,9 @@ const char* configfile = "config.json";
 const int saveInterval = 5;
 
 // Macros for JSON (de)serialization.
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ConfigWorker, windowWidth, windowHeight, windowMaximized)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, windowWidth, windowHeight, windowMaximized)
 
-[[noreturn]] void ConfigWorker::saveFile() {
+[[noreturn]] void Config::saveFile() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(saveInterval));
         // If there were no updates we need to write, just keep sleeping.
@@ -34,7 +34,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ConfigWorker, windowWidth, windowHeight, wind
     }
 }
 
-void ConfigWorker::load() {
+void Config::load() {
     std::ifstream ifs(configfile);
     if (ifs.good()) {
         std::cout << "Using " << configfile << " to read application configuration." << std::endl;
@@ -45,17 +45,17 @@ void ConfigWorker::load() {
         std::cerr << "Failed to open config file, using default settings." << std::endl;
     }
 
-    std::thread worker_thread(&ConfigWorker::saveFile, this);
+    std::thread worker_thread(&Config::saveFile, this);
     worker_thread.detach();
 }
 
-void ConfigWorker::saveWindowSize(int width, int height) {
+void Config::saveWindowSize(int width, int height) {
     windowWidth  = width;
     windowHeight = height;
     updated      = true;
 }
 
-void ConfigWorker::saveWindowMaximizedState(bool state) {
+void Config::saveWindowMaximizedState(bool state) {
     windowMaximized = state;
     updated         = true;
 }
