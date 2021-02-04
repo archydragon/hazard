@@ -43,6 +43,8 @@ void Config::load() {
         from_json(j, *this);
     } else {
         std::cerr << "Failed to open config file, using default settings." << std::endl;
+        // Trigger config update to save even default settings.
+        updated = true;
     }
 
     std::thread worker_thread(&Config::saveFile, this);

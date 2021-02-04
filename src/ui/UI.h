@@ -18,6 +18,7 @@ private:
     ImGuiIO io;
     Camera* camera;
     Scene* scene;
+    bool windowCamera = true;
 };
 
 #endif // HAZARD_UI_H

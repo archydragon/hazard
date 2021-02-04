@@ -17,6 +17,7 @@ UI::UI(GLFWwindow* window, Scene* pScene, Camera* pCamera) {
     ImGui::StyleColorsDark();
     io.Fonts->AddFontFromFileTTF("editor_assets/RobotoMono-Regular.ttf", 18.0f);
     io.Fonts->Build();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(NULL);
 
@@ -30,8 +31,6 @@ UI::~UI() {
 }
 
 void UI::initFrame() {
-    bool save = false;
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -41,26 +40,31 @@ void UI::initFrame() {
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Scene", true)) {
                 ImGui::MenuItem("New");
-                ImGui::MenuItem("Load");
-                save = ImGui::MenuItem("Save");
-
+                ImGui::MenuItem("Open");
+                if (ImGui::MenuItem("Save")) {
+                    scene->save();
+                }
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Window", true)) {
+                ImGui::Checkbox("Camera", &this->windowCamera);
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMainMenuBar();
         }
 
         // Camera window.
-        ImGui::SetNextWindowPos(ImVec2(980, 26), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(300, 128), ImGuiCond_FirstUseEver);
-        if (ImGui::Begin("Camera", NULL, ImGuiWindowFlags_NoCollapse)) {
-            ImGui::Checkbox("Freelook", &cameraFreelook);
-            ImGui::SliderFloat3("position", (float*)&camera->position, -20.0f, 20.0f);
-            ImGui::SliderFloat3("front", (float*)&camera->front, -1.0f, 1.0f);
-            ImGui::End();
-        }
-
-        if (save) {
-            scene->save();
+        if (this->windowCamera) {
+            ImGui::SetNextWindowPos(ImVec2(980, 26), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(300, 128), ImGuiCond_FirstUseEver);
+            if (ImGui::Begin("Camera", &this->windowCamera, ImGuiWindowFlags_NoCollapse)) {
+                ImGui::Checkbox("Freelook", &cameraFreelook);
+                ImGui::SliderFloat3("position", (float*)&camera->position, -20.0f, 20.0f);
+                ImGui::SliderFloat3("front", (float*)&camera->front, -1.0f, 1.0f);
+                ImGui::End();
+            }
         }
     }
 }
