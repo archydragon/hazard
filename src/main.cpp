@@ -67,10 +67,10 @@ int main() {
     Camera camera;
 
     // Create scene.
-    Scene scene(cfg.windowWidth, cfg.windowHeight, &camera);
+    Scene scene("scenes/sample_scene.json", cfg.windowWidth, cfg.windowHeight, &camera);
 
     // Instantiate Dear Imgui.
-    UI ui(window, &camera);
+    UI ui(window, &scene, &camera);
 
     // Main rendering loop.
     do {

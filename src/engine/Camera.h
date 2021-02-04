@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include "../glm2json.h"
+
 using namespace glm;
 
 class Camera {
@@ -27,5 +29,8 @@ private:
     float movementSpeed;
     float lookSensitivity;
 };
+
+// Macros for JSON (de)serialization.
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Camera, position, front)
 
 #endif // HAZARD_CAMERA_H

@@ -1,17 +1,23 @@
+#include <iomanip>
 #include <iostream>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <nlohmann/json.hpp>
 
 #include "Camera.h"
 #include "Scene.h"
-#include "Shader.h"
 
-Scene::Scene(int wpWidth, int wpHeight, Camera* cam) {
+using nlohmann::json;
+
+Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     camera       = cam;
     screenWidth  = wpWidth;
     screenHeight = wpHeight;
+
+    filename = pFilename;
+    this->load();
 
     this->shader = new Shader("assets/shaders/cube.vert", "assets/shaders/cube.frag");
 
@@ -102,4 +108,30 @@ void Scene::draw() {
     }
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+}
+
+// (De)serialization here is done in semi-manual way instead of macros because seems that
+// nlohmann_json has issues with templating pointers (and I need at least camera to be a pointer
+// here. Probably one day I'll make it more pretty.
+
+void Scene::load() {
+    std::ifstream ifs(filename);
+    if (ifs.good()) {
+        std::cout << "Using " << filename << " to load scene." << std::endl;
+        json j;
+        ifs >> j;
+
+        *this->camera = j["camera"].get<Camera>();
+    } else {
+        std::cerr << "Failed to open config file, using default settings." << std::endl;
+    }
+}
+
+void Scene::save() {
+    json j;
+    j["camera"] = *this->camera;
+
+    std::ofstream ofs(this->filename);
+    ofs << std::setw(4) << j.dump(2) << std::endl;
+    std::cout << "Scene saved." << std::endl;
 }

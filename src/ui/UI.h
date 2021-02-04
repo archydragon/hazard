@@ -2,11 +2,12 @@
 #define HAZARD_UI_H
 
 #include "../engine/Camera.h"
+#include "../engine/Scene.h"
 #include <imgui.h>
 
 class UI {
 public:
-    explicit UI(GLFWwindow* window, Camera* pCamera);
+    explicit UI(GLFWwindow* window, Scene* pCamera, Camera* pScene);
     void initFrame();
     static void render();
     virtual ~UI();
@@ -16,6 +17,7 @@ public:
 private:
     ImGuiIO io;
     Camera* camera;
+    Scene* scene;
 };
 
 #endif // HAZARD_UI_H
