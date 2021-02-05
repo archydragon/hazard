@@ -130,7 +130,7 @@ void Scene::load() {
 
         std::cout << "Scene loaded." << std::endl;
     } else {
-        std::cerr << "Failed to open config file, using default settings." << std::endl;
+        std::cerr << "Failed to open scene file, using default settings." << std::endl;
     }
 }
 
