@@ -18,7 +18,9 @@ private:
     ImGuiIO io;
     Camera* camera;
     Scene* scene;
-    bool windowCamera = true;
+    bool windowCamera    = true;
+    bool windowOpenScene = false;
+    std::vector<const char*> files;
 };
 
 #endif // HAZARD_UI_H

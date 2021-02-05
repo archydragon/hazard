@@ -20,7 +20,8 @@ add_subdirectory(3rdparty)
 # Libraries bundled under 3rdparty dir
 target_link_libraries(${PROJECT} PRIVATE
     glad
-    imgui)
+    imgui
+    ImGuiFileDialog)
 
 # Libraries installed through vcpkg
 find_package(glfw3 REQUIRED)

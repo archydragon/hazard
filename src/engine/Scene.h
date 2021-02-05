@@ -10,6 +10,8 @@ public:
     void draw();
     void save();
 
+    void load(const char* pFilename);
+
 private:
     const char* filename;
     int screenWidth;

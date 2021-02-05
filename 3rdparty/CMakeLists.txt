@@ -20,3 +20,11 @@ add_library(${DEP_IMGUI} STATIC
     ${DEP_IMGUI}/backends/imgui_impl_opengl3.cpp)
 target_include_directories(${DEP_IMGUI} PUBLIC
     ${DEP_IMGUI})
+
+# ImGuiFileDialog
+set(DEP_FILEDIALOG ImGuiFileDialog)
+include_directories(${DEP_IMGUI}) # include original Imgui
+add_library(${DEP_FILEDIALOG} STATIC
+    ${DEP_FILEDIALOG}/ImGuiFileDialog.cpp)
+target_include_directories(${DEP_FILEDIALOG} PUBLIC
+    ${DEP_FILEDIALOG})

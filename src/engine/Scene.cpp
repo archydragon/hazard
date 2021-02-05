@@ -110,6 +110,11 @@ void Scene::draw() {
     glBindVertexArray(0);
 }
 
+void Scene::load(const char* pFilename) {
+    this->filename = pFilename;
+    this->load();
+}
+
 // (De)serialization here is done in semi-manual way instead of macros because seems that
 // nlohmann_json has issues with templating pointers (and I need at least camera to be a pointer
 // here. Probably one day I'll make it more pretty.

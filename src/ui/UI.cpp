@@ -1,10 +1,13 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <ImGuiFileDialog.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 
 #include "UI.h"
+
+namespace fs = std::filesystem;
 
 bool UI::cameraFreelook = false;
 
@@ -40,7 +43,9 @@ void UI::initFrame() {
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Scene", true)) {
                 ImGui::MenuItem("New");
-                ImGui::MenuItem("Open");
+                if (ImGui::MenuItem("Open")) {
+                    this->windowOpenScene = true;
+                }
                 if (ImGui::MenuItem("Save")) {
                     scene->save();
                 }
@@ -53,6 +58,33 @@ void UI::initFrame() {
             }
 
             ImGui::EndMainMenuBar();
+        }
+
+        // Open scene dialog.
+        if (this->windowOpenScene) {
+            // Instantiate.
+            ImGuiFileDialog::Instance()->OpenDialog("OpenScene", "Open scene file", ".scene", ".");
+
+            // Display configuration.
+            // Set default window size.
+            ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_FirstUseEver);
+            // Highlight .scene files with bright green.
+            ImGuiFileDialog::Instance()->SetExtentionInfos(".scene", ImVec4(0, 1, 0.5, 1));
+
+            // Display.
+            if (ImGuiFileDialog::Instance()->Display("OpenScene")) {
+                // action if OK
+                if (ImGuiFileDialog::Instance()->IsOk()) {
+                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                    std::string filePath     = ImGuiFileDialog::Instance()->GetCurrentPath();
+                    // action
+                    scene->load(filePathName.c_str());
+                }
+
+                // close
+                ImGuiFileDialog::Instance()->Close();
+                this->windowOpenScene = false;
+            }
         }
 
         // Camera window.
