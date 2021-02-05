@@ -127,6 +127,8 @@ void Scene::load() {
         ifs >> j;
 
         *this->camera = j["camera"].get<Camera>();
+
+        std::cout << "Scene loaded." << std::endl;
     } else {
         std::cerr << "Failed to open config file, using default settings." << std::endl;
     }

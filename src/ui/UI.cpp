@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 bool UI::cameraFreelook = false;
 
-UI::UI(GLFWwindow* window, Scene* pScene, Camera* pCamera) {
+UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     // IMGUI initialization
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -24,8 +24,9 @@ UI::UI(GLFWwindow* window, Scene* pScene, Camera* pCamera) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(NULL);
 
-    camera = pCamera;
-    scene  = pScene;
+    appConfig = config;
+    camera    = pCamera;
+    scene     = pScene;
 }
 
 UI::~UI() {
@@ -79,6 +80,7 @@ void UI::initFrame() {
                     std::string filePath     = ImGuiFileDialog::Instance()->GetCurrentPath();
                     // action
                     scene->load(filePathName.c_str());
+                    appConfig->saveSceneFile(filePathName);
                 }
 
                 // close

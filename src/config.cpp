@@ -1,9 +1,11 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <thread>
 
 #include <nlohmann/json.hpp>
+#include <utility>
 
 #include "Config.h"
 
@@ -13,7 +15,7 @@ const char* configfile = "config.json";
 const int saveInterval = 5;
 
 // Macros for JSON (de)serialization.
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, windowWidth, windowHeight, windowMaximized)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, windowWidth, windowHeight, windowMaximized, sceneFile)
 
 [[noreturn]] void Config::saveFile() {
     while (true) {
@@ -60,4 +62,9 @@ void Config::saveWindowSize(int width, int height) {
 void Config::saveWindowMaximizedState(bool state) {
     windowMaximized = state;
     updated         = true;
+}
+
+void Config::saveSceneFile(std::string pSceneFile) {
+    sceneFile = std::move(pSceneFile);
+    updated   = true;
 }

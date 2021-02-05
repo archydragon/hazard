@@ -9,10 +9,12 @@ public:
     unsigned int windowWidth  = 1280;
     unsigned int windowHeight = 720;
     bool windowMaximized      = false;
+    std::string sceneFile     = "scenes\\sample.scene";
 
     void load();
     void saveWindowSize(int width, int height);
     void saveWindowMaximizedState(bool state);
+    void saveSceneFile(std::string pSceneFile);
 
 private:
     bool updated = false;
