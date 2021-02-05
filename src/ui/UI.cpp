@@ -12,6 +12,8 @@ namespace fs = std::filesystem;
 bool UI::cameraFreelook = false;
 
 UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
+    this->window = window;
+
     // IMGUI initialization
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -27,6 +29,8 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     appConfig = config;
     camera    = pCamera;
     scene     = pScene;
+
+    this->updateWindowTitle();
 }
 
 UI::~UI() {
@@ -82,6 +86,7 @@ void UI::initFrame() {
                     // action
                     scene->load(filePathName.c_str());
                     appConfig->saveSceneFile(filePathName);
+                    this->updateWindowTitle();
                 }
 
                 // close
@@ -167,4 +172,12 @@ void UI::initFrame() {
 void UI::render() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void UI::updateWindowTitle() {
+    char newTitle[256];
+    std::string basename =
+        this->appConfig->sceneFile.substr(this->appConfig->sceneFile.find_last_of("/\\") + 1);
+    sprintf(newTitle, "%s - Hazard", basename.c_str());
+    glfwSetWindowTitle(this->window, newTitle);
 }

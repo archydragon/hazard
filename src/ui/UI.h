@@ -16,6 +16,7 @@ public:
     static bool cameraFreelook;
 
 private:
+    GLFWwindow* window;
     ImGuiIO io;
     Config* appConfig;
     Camera* camera;
@@ -27,6 +28,7 @@ private:
     bool popupNewObject  = false;
     std::string newObjectTypeName;
     int selectedObject = 0;
+    void updateWindowTitle();
 };
 
 #endif // HAZARD_UI_H
