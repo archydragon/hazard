@@ -21,8 +21,12 @@ private:
     Camera* camera;
     Scene* scene;
     bool windowCamera    = true;
+    bool windowObjects   = true;
     bool windowOpenScene = false;
-    std::vector<const char*> files;
+    int newObjectType    = 0;
+    bool popupNewObject  = false;
+    std::string newObjectTypeName;
+    int selectedObject = 0;
 };
 
 #endif // HAZARD_UI_H

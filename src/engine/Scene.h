@@ -1,6 +1,7 @@
 #ifndef HAZARD_SCENE_H
 #define HAZARD_SCENE_H
 
+#include "./scene_objects/BaseObject.h"
 #include "Camera.h"
 #include "Shader.h"
 
@@ -9,8 +10,11 @@ public:
     Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam);
     void draw();
     void save();
-
     void load(const char* pFilename);
+    static std::map<ObjectType, std::string> listObjectTypes();
+    void createObject(int t, const char* n);
+
+    std::vector<BaseObject> objects;
 
 private:
     const char* filename;

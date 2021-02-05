@@ -54,6 +54,7 @@ void UI::initFrame() {
             }
 
             if (ImGui::BeginMenu("Window", true)) {
+                ImGui::Checkbox("Objects", &this->windowObjects);
                 ImGui::Checkbox("Camera", &this->windowCamera);
                 ImGui::EndMenu();
             }
@@ -89,6 +90,42 @@ void UI::initFrame() {
             }
         }
 
+        // Objects window.
+        if (this->windowObjects) {
+            ImGui::SetNextWindowPos(ImVec2(0, 26), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_FirstUseEver);
+            if (ImGui::Begin("Objects", &this->windowObjects,
+                             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+                // Menu
+                if (ImGui::BeginMenuBar()) {
+                    if (ImGui::BeginMenu("Add")) {
+                        for (auto& t : Scene::listObjectTypes()) {
+                            if (ImGui::MenuItem(t.second.c_str())) {
+                                this->newObjectType     = t.first;
+                                this->newObjectTypeName = t.second;
+                                this->popupNewObject    = true;
+                            }
+                        }
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndMenuBar();
+                }
+
+                // Objects list
+                for (int i = 0; i < scene->objects.size(); i++) {
+                    if (ImGui::Selectable(scene->objects[i].name.c_str(), false,
+                                          ImGuiSelectableFlags_AllowDoubleClick)) {
+                        this->selectedObject = i;
+                        if (ImGui::IsMouseDoubleClicked(0)) {
+                            std::cout << "double cliek " << i << std::endl;
+                        }
+                    }
+                }
+
+                ImGui::End();
+            }
+        }
+
         // Camera window.
         if (this->windowCamera) {
             ImGui::SetNextWindowPos(ImVec2(980, 26), ImGuiCond_FirstUseEver);
@@ -99,6 +136,30 @@ void UI::initFrame() {
                 ImGui::SliderFloat3("front", (float*)&camera->front, -1.0f, 1.0f);
                 ImGui::End();
             }
+        }
+
+        if (this->popupNewObject) {
+            ImGui::OpenPopup("New object");
+            this->popupNewObject = false;
+        }
+
+        if (ImGui::BeginPopupModal("New object", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Object type: %s", this->newObjectTypeName.c_str());
+            static char name[256];
+            ImGui::Text("Object name:");
+            ImGui::SameLine();
+            ImGui::InputText("", name, IM_ARRAYSIZE(name));
+            if (ImGui::Button("Create")) {
+                this->scene->createObject(this->newObjectType, name);
+                name[0] = '\0';
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) {
+                name[0] = '\0';
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
         }
     }
 }

@@ -1,11 +1,14 @@
 #include <iomanip>
 #include <iostream>
+#include <map>
+#include <random>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <nlohmann/json.hpp>
 
+#include "./scene_objects/BaseObject.h"
 #include "Camera.h"
 #include "Scene.h"
 
@@ -127,7 +130,9 @@ void Scene::load() {
         ifs >> j;
 
         *this->camera = j["camera"].get<Camera>();
+        this->objects = j["objects"].get<std::vector<BaseObject>>();
 
+        std::cout << "Scene has " << this->objects.size() << " objects." << std::endl;
         std::cout << "Scene loaded." << std::endl;
     } else {
         std::cerr << "Failed to open scene file, using default settings." << std::endl;
@@ -136,9 +141,27 @@ void Scene::load() {
 
 void Scene::save() {
     json j;
-    j["camera"] = *this->camera;
+    j["camera"]  = *this->camera;
+    j["objects"] = this->objects;
 
     std::ofstream ofs(this->filename);
     ofs << std::setw(4) << j.dump(2) << std::endl;
     std::cout << "Scene saved." << std::endl;
+}
+
+std::map<ObjectType, std::string> Scene::listObjectTypes() {
+    std::map<ObjectType, std::string> types;
+    types.insert(std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "Shader source file"));
+    types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "Shader program"));
+    return types;
+}
+
+void Scene::createObject(int t, const char* n) {
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(1, INT32_MAX);
+
+    BaseObject obj(distribution(generator), static_cast<ObjectType>(t), n);
+    objects.push_back(obj);
+    std::cout << "Object (ID = " << obj.id << ") created." << std::endl;
 }
