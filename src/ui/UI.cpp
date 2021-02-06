@@ -32,7 +32,9 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     scene     = pScene;
 
     this->updateWindowTitle();
-    this->windowProperties.push_back(false * scene->objects.size());
+    for (int i = 0; i < scene->objects.size(); i++) {
+        this->windowProperties.push_back(false);
+    }
 }
 
 UI::~UI() {
