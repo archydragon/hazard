@@ -1,10 +1,13 @@
 #ifndef HAZARD_UI_H
 #define HAZARD_UI_H
 
+#include <deque>
+
+#include <imgui.h>
+
 #include "../Config.h"
 #include "../engine/Camera.h"
 #include "../engine/Scene.h"
-#include <imgui.h>
 
 class UI {
 public:
@@ -27,6 +30,7 @@ private:
     bool popupNewObject  = false;
     int newObjectType    = 0;
     std::string newObjectTypeName;
+    std::deque<bool> windowProperties;
 
     void updateWindowTitle();
 };

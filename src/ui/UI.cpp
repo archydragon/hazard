@@ -31,6 +31,7 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     scene     = pScene;
 
     this->updateWindowTitle();
+    this->windowProperties.push_back(false * scene->objects.size());
 }
 
 UI::~UI() {
@@ -121,7 +122,7 @@ void UI::initFrame() {
                     if (ImGui::Selectable(scene->objects[i]->name.c_str(), false,
                                           ImGuiSelectableFlags_AllowDoubleClick)) {
                         if (ImGui::IsMouseDoubleClicked(0)) {
-                            std::cout << "double cliek " << i << std::endl;
+                            this->windowProperties[i] = true;
                         }
                     }
                 }
@@ -142,11 +143,26 @@ void UI::initFrame() {
             }
         }
 
+        // Properties windows.
+        for (int i = 0; i < this->windowProperties.size(); i++) {
+            if (!this->windowProperties.at(i)) {
+                continue;
+            }
+            ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_FirstUseEver);
+            char windowTitle[256] = "";
+            sprintf(windowTitle, "%s - properties", this->scene->objects.at(i)->name.c_str());
+            if (ImGui::Begin(windowTitle, &this->windowProperties.at(i),
+                             ImGuiWindowFlags_NoCollapse)) {
+                ImGui::Text("PROPES");
+                ImGui::End();
+            }
+        }
+
+        // Modal popup for creating a new object.
         if (this->popupNewObject) {
             ImGui::OpenPopup("New object");
             this->popupNewObject = false;
         }
-
         if (ImGui::BeginPopupModal("New object", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("Object type: %s", this->newObjectTypeName.c_str());
             static char name[256];
@@ -155,6 +171,7 @@ void UI::initFrame() {
             ImGui::InputText("", name, IM_ARRAYSIZE(name));
             if (ImGui::Button("Create")) {
                 this->scene->createObject(this->newObjectType, name);
+                this->windowProperties.push_back(false);
                 name[0] = '\0';
                 ImGui::CloseCurrentPopup();
             }
