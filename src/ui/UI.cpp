@@ -5,6 +5,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 
+#include "../engine/scene_objects/ShaderSourceFile.h"
 #include "UI.h"
 
 namespace fs = std::filesystem;
@@ -153,7 +154,17 @@ void UI::initFrame() {
             sprintf(windowTitle, "%s - properties", this->scene->objects.at(i)->name.c_str());
             if (ImGui::Begin(windowTitle, &this->windowProperties.at(i),
                              ImGuiWindowFlags_NoCollapse)) {
-                ImGui::Text("PROPES");
+                switch (ObjectType(this->scene->objects.at(i)->type)) {
+                case UNDEFINED:
+                    break;
+                case SHADER_PROGRAM:
+                    break;
+                case SHADER_SOURCE_FILE:
+                    this->propertiesShaderSourceFile(
+                        reinterpret_cast<std::unique_ptr<ShaderSourceFile>&>(
+                            this->scene->objects.at(i)));
+                    break;
+                }
                 ImGui::End();
             }
         }
@@ -196,4 +207,44 @@ void UI::updateWindowTitle() {
         this->appConfig->sceneFile.substr(this->appConfig->sceneFile.find_last_of("/\\") + 1);
     sprintf(newTitle, "%s - Hazard", basename.c_str());
     glfwSetWindowTitle(this->window, newTitle);
+}
+
+void UI::propertiesShaderSourceFile(std::unique_ptr<ShaderSourceFile>& optr) {
+    ImGui::Text("File:");
+    ImGui::SameLine();
+    ImGui::InputText("", const_cast<char*>(optr->filename.c_str()), 512,
+                     ImGuiInputTextFlags_ReadOnly);
+    ImGui::SameLine();
+    if (ImGui::Button("Select")) {
+        this->windowOpenShader = true;
+    }
+
+    // Open shader file dialog.
+    if (this->windowOpenShader) {
+        // Instantiate.
+        ImGuiFileDialog::Instance()->OpenDialog("OpenShader", "Open shader file",
+                                                ".vert .frag .geom{.vert,.frag,.geom},.*", ".");
+
+        // Display configuration.
+        // Set default window size.
+        ImGui::SetNextWindowSize(ImVec2(700, 450), ImGuiCond_FirstUseEver);
+        // Highlight shader files with bright green.
+        ImGuiFileDialog::Instance()->SetExtentionInfos(".frag", ImVec4(0.1, 1, 0.2, 1));
+        ImGuiFileDialog::Instance()->SetExtentionInfos(".vert", ImVec4(0, 1, 0.5, 1));
+        ImGuiFileDialog::Instance()->SetExtentionInfos(".geom", ImVec4(0.2, 1, 0.3, 1));
+
+        // Display.
+        if (ImGuiFileDialog::Instance()->Display("OpenShader")) {
+            // action if OK
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                // action
+                optr->filename = filePathName;
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            this->windowOpenShader = false;
+        }
+    }
 }

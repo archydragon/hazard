@@ -11,7 +11,7 @@ public:
     ShaderSourceFile(unsigned int pId, ObjectType pType, const char* pName)
         : BaseObject(pId, pType, pName){};
 
-    std::string filename = "cube.vert";
+    std::string filename;
 };
 
 // Macros for JSON (de)serialization.
