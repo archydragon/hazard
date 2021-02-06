@@ -178,8 +178,9 @@ void Scene::save() {
 
 std::map<ObjectType, std::string> Scene::listObjectTypes() {
     std::map<ObjectType, std::string> types;
-    types.insert(std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "Shader source file"));
-    types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "Shader program"));
+    types.insert(
+        std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
+    types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
     return types;
 }
 

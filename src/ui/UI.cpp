@@ -24,6 +24,12 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
 
     // Font configuration.
     io.Fonts->AddFontFromFileTTF("editor_assets/RobotoMono-Regular.ttf", 18.0f);
+    ImFontConfig imfc;
+    imfc.MergeMode        = true;
+    imfc.GlyphMaxAdvanceX = 14.0f;
+    imfc.GlyphOffset.y += 5.0f;
+    static const ImWchar iconRanges[] = {0xE000, 0xE0FE, 0};
+    io.Fonts->AddFontFromFileTTF("editor_assets/OpenFontIcons.ttf", 22.0f, &imfc, iconRanges);
     io.Fonts->Build();
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -125,8 +131,19 @@ void UI::initFrame() {
 
                 // Objects list
                 for (int i = 0; i < scene->objects.size(); i++) {
-                    if (ImGui::Selectable(scene->objects[i]->name.c_str(), false,
-                                          ImGuiSelectableFlags_AllowDoubleClick)) {
+                    // TODO: make it better
+                    std::string icon;
+                    switch (scene->objects[i]->type) {
+                    case SHADER_SOURCE_FILE:
+                        icon = "\xee\x81\x9f";
+                        break;
+                    case SHADER_PROGRAM:
+                        icon = "\xee\x82\xbc";
+                        break;
+                    }
+                    char itemLine[256];
+                    sprintf(itemLine, "%s %s", icon.c_str(), scene->objects[i]->name.c_str());
+                    if (ImGui::Selectable(itemLine, false, ImGuiSelectableFlags_AllowDoubleClick)) {
                         if (ImGui::IsMouseDoubleClicked(0)) {
                             this->windowProperties[i] = true;
                         }
