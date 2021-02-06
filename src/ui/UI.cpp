@@ -104,10 +104,10 @@ void UI::initFrame() {
                 // Menu
                 if (ImGui::BeginMenuBar()) {
                     if (ImGui::BeginMenu("Add")) {
-                        for (auto& t : Scene::listObjectTypes()) {
-                            if (ImGui::MenuItem(t.second.c_str())) {
-                                this->newObjectType     = t.first;
-                                this->newObjectTypeName = t.second;
+                        for (auto& [type, name] : Scene::listObjectTypes()) {
+                            if (ImGui::MenuItem(name.c_str())) {
+                                this->newObjectType     = type;
+                                this->newObjectTypeName = name;
                                 this->popupNewObject    = true;
                             }
                         }
@@ -118,9 +118,8 @@ void UI::initFrame() {
 
                 // Objects list
                 for (int i = 0; i < scene->objects.size(); i++) {
-                    if (ImGui::Selectable(scene->objects[i].name.c_str(), false,
+                    if (ImGui::Selectable(scene->objects[i]->name.c_str(), false,
                                           ImGuiSelectableFlags_AllowDoubleClick)) {
-                        this->selectedObject = i;
                         if (ImGui::IsMouseDoubleClicked(0)) {
                             std::cout << "double cliek " << i << std::endl;
                         }

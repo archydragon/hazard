@@ -24,10 +24,10 @@ private:
     bool windowCamera    = true;
     bool windowObjects   = true;
     bool windowOpenScene = false;
-    int newObjectType    = 0;
     bool popupNewObject  = false;
+    int newObjectType    = 0;
     std::string newObjectTypeName;
-    int selectedObject = 0;
+
     void updateWindowTitle();
 };
 

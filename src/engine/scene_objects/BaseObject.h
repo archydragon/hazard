@@ -1,7 +1,7 @@
 #ifndef HAZARD_BASEOBJECT_H
 #define HAZARD_BASEOBJECT_H
 
-#include <nlohmann/json.hpp>
+#include <string>
 
 enum ObjectType
 {
@@ -14,13 +14,11 @@ class BaseObject {
 public:
     BaseObject();
     BaseObject(unsigned int pId, ObjectType pType, const char* pName);
+    virtual ~BaseObject() = default;
 
-    unsigned int id{};
+    unsigned int id;
     ObjectType type = UNDEFINED;
     std::string name;
 };
-
-// Macros for JSON (de)serialization.
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BaseObject, id, type, name)
 
 #endif // HAZARD_BASEOBJECT_H

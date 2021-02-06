@@ -8,9 +8,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <nlohmann/json.hpp>
 
-#include "./scene_objects/BaseObject.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "scene_objects/BaseObject.h"
+#include "scene_objects/ShaderSourceFile.h"
 
 using nlohmann::json;
 
@@ -130,7 +131,18 @@ void Scene::load() {
         ifs >> j;
 
         *this->camera = j["camera"].get<Camera>();
-        this->objects = j["objects"].get<std::vector<BaseObject>>();
+        //        this->objects = j["objects"].get<std::vector<BaseObject>>();
+        for (auto& it : j["objects"]) {
+            switch (ObjectType(it["type"])) {
+            case UNDEFINED:
+                break;
+            case SHADER_SOURCE_FILE:
+                objects.push_back(std::make_unique<ShaderSourceFile>(it.get<ShaderSourceFile>()));
+                break;
+            case SHADER_PROGRAM:
+                break;
+            }
+        }
 
         std::cout << "Scene has " << this->objects.size() << " objects." << std::endl;
         std::cout << "Scene loaded." << std::endl;
@@ -142,7 +154,20 @@ void Scene::load() {
 void Scene::save() {
     json j;
     j["camera"]  = *this->camera;
-    j["objects"] = this->objects;
+    j["objects"] = json::array();
+    for (auto& o : this->objects) {
+        json jo;
+        switch (o->type) {
+        case UNDEFINED:
+            break;
+        case SHADER_SOURCE_FILE:
+            jo = (*dynamic_cast<ShaderSourceFile*>(o.get()));
+            break;
+        case SHADER_PROGRAM:
+            break;
+        }
+        j["objects"].push_back(jo);
+    }
 
     std::ofstream ofs(this->filename);
     ofs << std::setw(4) << j.dump(2) << std::endl;
@@ -161,7 +186,21 @@ void Scene::createObject(int t, const char* n) {
     std::mt19937 generator(rd());
     std::uniform_int_distribution<int> distribution(1, INT32_MAX);
 
-    BaseObject obj(distribution(generator), static_cast<ObjectType>(t), n);
-    objects.push_back(obj);
-    std::cout << "Object (ID = " << obj.id << ") created." << std::endl;
+    int newId = distribution(generator);
+    switch (ObjectType(t)) {
+    case SHADER_SOURCE_FILE:
+        objects.push_back(std::make_unique<ShaderSourceFile>(newId, ObjectType(t), n));
+        break;
+    case UNDEFINED:
+        std::cerr << "New object type is not defined." << std::endl;
+        return;
+    case SHADER_PROGRAM:
+        std::cout << "Not implemented yet." << std::endl;
+        return;
+    default:
+        std::cerr << "Unsupported object type: " << t << std::endl;
+        return;
+    }
+
+    std::cout << "Object (ID = " << newId << ") created." << std::endl;
 }

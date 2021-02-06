@@ -14,7 +14,7 @@ public:
     static std::map<ObjectType, std::string> listObjectTypes();
     void createObject(int t, const char* n);
 
-    std::vector<BaseObject> objects;
+    std::vector<std::unique_ptr<BaseObject>> objects;
 
 private:
     const char* filename;
