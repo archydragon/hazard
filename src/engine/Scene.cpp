@@ -10,7 +10,7 @@
 
 #include "Camera.h"
 #include "Scene.h"
-#include "scene_objects/BaseObject.h"
+#include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
 
 using nlohmann::json;
@@ -140,6 +140,7 @@ void Scene::load() {
                 objects.push_back(std::make_unique<ShaderSourceFile>(it.get<ShaderSourceFile>()));
                 break;
             case SHADER_PROGRAM:
+                objects.push_back(std::make_unique<ShaderProgram>(it.get<ShaderProgram>()));
                 break;
             }
         }
@@ -164,6 +165,7 @@ void Scene::save() {
             jo = (*dynamic_cast<ShaderSourceFile*>(o.get()));
             break;
         case SHADER_PROGRAM:
+            jo = (*dynamic_cast<ShaderProgram*>(o.get()));
             break;
         }
         j["objects"].push_back(jo);
@@ -188,14 +190,14 @@ void Scene::createObject(int t, const char* n) {
 
     int newId = distribution(generator);
     switch (ObjectType(t)) {
-    case SHADER_SOURCE_FILE:
-        objects.push_back(std::make_unique<ShaderSourceFile>(newId, ObjectType(t), n));
-        break;
     case UNDEFINED:
         std::cerr << "New object type is not defined." << std::endl;
         return;
+    case SHADER_SOURCE_FILE:
+        objects.push_back(std::make_unique<ShaderSourceFile>(newId, ObjectType(t), n));
+        break;
     case SHADER_PROGRAM:
-        std::cout << "Not implemented yet." << std::endl;
+        objects.push_back(std::make_unique<ShaderProgram>(newId, ObjectType(t), n));
         return;
     default:
         std::cerr << "Unsupported object type: " << t << std::endl;
@@ -203,4 +205,13 @@ void Scene::createObject(int t, const char* n) {
     }
 
     std::cout << "Object (ID = " << newId << ") created." << std::endl;
+}
+
+const char* Scene::getObjectNameByID(unsigned int id) {
+    for (auto& o : this->objects) {
+        if (o->id == id) {
+            return o->name.c_str();
+        }
+    }
+    return nullptr;
 }

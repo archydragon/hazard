@@ -8,6 +8,7 @@
 #include "../Config.h"
 #include "../engine/Camera.h"
 #include "../engine/Scene.h"
+#include "../engine/scene_objects/ShaderProgram.h"
 #include "../engine/scene_objects/ShaderSourceFile.h"
 
 class UI {
@@ -36,6 +37,7 @@ private:
 
     void updateWindowTitle();
     void propertiesShaderSourceFile(std::unique_ptr<ShaderSourceFile>& optr);
+    void propertiesShaderProgram(std::unique_ptr<ShaderProgram>& optr);
 };
 
 #endif // HAZARD_UI_H

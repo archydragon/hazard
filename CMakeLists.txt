@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-D_DLL -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 
-add_executable(${PROJECT} src/main.cpp src/Config.cpp src/Config.h src/ui/UI.cpp src/ui/UI.h src/engine/Camera.cpp src/engine/Camera.h src/engine/Scene.cpp src/engine/Scene.h src/engine/Shader.h src/engine/Shader.cpp src/glm2json.h src/engine/scene_objects/BaseObject.cpp src/engine/scene_objects/BaseObject.h src/engine/scene_objects/ShaderSourceFile.cpp src/engine/scene_objects/ShaderSourceFile.h)
+add_executable(${PROJECT} src/main.cpp src/Config.cpp src/Config.h src/ui/UI.cpp src/ui/UI.h src/engine/Camera.cpp src/engine/Camera.h src/engine/Scene.cpp src/engine/Scene.h src/engine/Shader.h src/engine/Shader.cpp src/glm2json.h src/engine/scene_objects/BaseObject.cpp src/engine/scene_objects/BaseObject.h src/engine/scene_objects/ShaderSourceFile.cpp src/engine/scene_objects/ShaderSourceFile.h src/engine/scene_objects/ShaderProgram.cpp src/engine/scene_objects/ShaderProgram.h)
 
 # Add CMakeLists.txt for 3rd party libs
 add_subdirectory(3rdparty)

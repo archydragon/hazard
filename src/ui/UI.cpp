@@ -21,8 +21,11 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
+
+    // Font configuration.
     io.Fonts->AddFontFromFileTTF("editor_assets/RobotoMono-Regular.ttf", 18.0f);
     io.Fonts->Build();
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(NULL);
@@ -160,6 +163,8 @@ void UI::initFrame() {
                 case UNDEFINED:
                     break;
                 case SHADER_PROGRAM:
+                    this->propertiesShaderProgram(reinterpret_cast<std::unique_ptr<ShaderProgram>&>(
+                        this->scene->objects.at(i)));
                     break;
                 case SHADER_SOURCE_FILE:
                     this->propertiesShaderSourceFile(
@@ -214,8 +219,7 @@ void UI::updateWindowTitle() {
 void UI::propertiesShaderSourceFile(std::unique_ptr<ShaderSourceFile>& optr) {
     ImGui::Text("File:");
     ImGui::SameLine();
-    ImGui::InputText("", const_cast<char*>(optr->filename.c_str()), 512,
-                     ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText("", (char*)(optr->filename.c_str()), 512, ImGuiInputTextFlags_ReadOnly);
     ImGui::SameLine();
     if (ImGui::Button("Select")) {
         this->windowOpenShader = true;
@@ -249,4 +253,59 @@ void UI::propertiesShaderSourceFile(std::unique_ptr<ShaderSourceFile>& optr) {
             this->windowOpenShader = false;
         }
     }
+}
+void UI::propertiesShaderProgram(std::unique_ptr<ShaderProgram>& optr) {
+    std::map<const char*, unsigned int> objs;
+    for (auto& o : this->scene->objects) {
+        objs.insert(std::pair<const char*, unsigned int>(o->name.c_str(), o->id));
+    }
+
+    static const char* current_vertex;
+    if (optr->vertexShaderFileID > 0) {
+        current_vertex = this->scene->getObjectNameByID(optr->vertexShaderFileID);
+    }
+    static const char* current_fragment;
+    if (optr->fragmentShaderFileID > 0) {
+        current_fragment = this->scene->getObjectNameByID(optr->fragmentShaderFileID);
+    }
+
+    // Vertex shader selector
+    ImGui::Text("Vertex shader:  ");
+    ImGui::SameLine();
+    ImGui::PushItemWidth(180);
+    if (ImGui::BeginCombo("##comboVertex", current_vertex)) {
+        for (auto [name, id] : objs) {
+            bool is_selected;
+            is_selected = current_vertex && (current_vertex == name);
+            if (ImGui::Selectable(name, is_selected)) {
+                current_vertex           = name;
+                optr->vertexShaderFileID = objs.find(name)->second;
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::PopItemWidth();
+
+    // Fragment shader selector
+    ImGui::Text("Fragment shader:");
+    ImGui::SameLine();
+    ImGui::PushItemWidth(180);
+    if (ImGui::BeginCombo("##comboFragment", current_fragment)) {
+        for (auto [name, id] : objs) {
+            bool is_selected;
+            is_selected = current_fragment && (current_fragment == name);
+            if (ImGui::Selectable(name, is_selected)) {
+                current_fragment           = name;
+                optr->fragmentShaderFileID = objs.find(name)->second;
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::PopItemWidth();
 }

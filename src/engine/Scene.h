@@ -16,6 +16,8 @@ public:
 
     std::vector<std::unique_ptr<BaseObject>> objects;
 
+    const char* getObjectNameByID(unsigned int id);
+
 private:
     const char* filename;
     int screenWidth;
