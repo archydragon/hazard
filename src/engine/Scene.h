@@ -1,9 +1,8 @@
 #ifndef HAZARD_SCENE_H
 #define HAZARD_SCENE_H
 
-#include "./scene_objects/BaseObject.h"
 #include "Camera.h"
-#include "Shader.h"
+#include "scene_objects/BaseObject.h"
 
 class Scene {
 public:
@@ -14,7 +13,7 @@ public:
     static std::map<ObjectType, std::string> listObjectTypes();
     void createObject(int t, const char* n);
 
-    std::vector<std::unique_ptr<BaseObject>> objects;
+    Objects objects;
 
     const char* getObjectNameByID(unsigned int id);
 
@@ -23,7 +22,6 @@ private:
     int screenWidth;
     int screenHeight;
     Camera* camera;
-    Shader* shader;
     unsigned int vao = 0;
     unsigned int vbo = 0;
 

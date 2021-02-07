@@ -1,7 +1,9 @@
 #ifndef HAZARD_BASEOBJECT_H
 #define HAZARD_BASEOBJECT_H
 
+#include <memory>
 #include <string>
+#include <vector>
 
 enum ObjectType
 {
@@ -20,5 +22,7 @@ public:
     ObjectType type = UNDEFINED;
     std::string name;
 };
+
+typedef std::vector<std::unique_ptr<BaseObject>> Objects;
 
 #endif // HAZARD_BASEOBJECT_H

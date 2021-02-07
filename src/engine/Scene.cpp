@@ -23,7 +23,26 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     filename = pFilename;
     this->load();
 
-    this->shader = new Shader("assets/shaders/cube.vert", "assets/shaders/cube.frag");
+    for (auto& o : this->objects) {
+        if (o->type == SHADER_PROGRAM) {
+            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
+            shader->resolveLinks(this->objects);
+        }
+    }
+
+    for (auto& o : this->objects) {
+        if (o->type == SHADER_SOURCE_FILE) {
+            auto* shader = dynamic_cast<ShaderSourceFile*>(o.get());
+            shader->load();
+        }
+    }
+
+    for (auto& o : this->objects) {
+        if (o->type == SHADER_PROGRAM) {
+            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
+            shader->load();
+        }
+    }
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -73,13 +92,13 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     };
     // clang-format on
     // first, configure the cube's VAO (and VBO)
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &this->vao);
+    glGenBuffers(1, &this->vbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(vao);
+    glBindVertexArray(this->vao);
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -92,24 +111,29 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
 }
 
 void Scene::draw() {
-    shader->use();
-    unsigned int err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::endl;
-    }
     mat4 projection =
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     mat4 view  = camera->getViewMatrix();
     mat4 model = mat4(0.5f);
-    shader->setMat4("projection", projection);
-    shader->setMat4("view", view);
-    shader->setMat4("model", model);
 
-    glBindVertexArray(vao);
-    err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cout << "BIND OpenGL error: 0x" << std::hex << err << std::endl;
+    for (auto& o : this->objects) {
+        if (o->type == SHADER_PROGRAM) {
+            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
+
+            shader->use();
+            shader->setMat4("projection", projection);
+            shader->setMat4("view", view);
+            shader->setMat4("model", model);
+        }
     }
+
+    // FIXME: it throws one GL_INVALID_OPERATION error for the very first frame.
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::endl;
+    }
+
+    glBindVertexArray(this->vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }
@@ -131,7 +155,6 @@ void Scene::load() {
         ifs >> j;
 
         *this->camera = j["camera"].get<Camera>();
-        //        this->objects = j["objects"].get<std::vector<BaseObject>>();
         for (auto& it : j["objects"]) {
             switch (ObjectType(it["type"])) {
             case UNDEFINED:
