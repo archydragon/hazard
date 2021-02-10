@@ -3,6 +3,8 @@
 
 #include "Camera.h"
 #include "scene_objects/BaseObject.h"
+#include "scene_objects/ShaderProgram.h"
+#include "scene_objects/ShaderSourceFile.h"
 
 class Scene {
 public:
@@ -10,12 +12,26 @@ public:
     void draw();
     void save();
     void load(const char* pFilename);
+    std::map<ObjectID, ObjectType> objectMap;
     static std::map<ObjectType, std::string> listObjectTypes();
-    void createObject(int t, const char* n);
+    ObjectID createObject(int t, const char* n);
 
-    Objects objects;
+    template <class C> typename C::Objects objects();
+    template <> typename ShaderSourceFile::Objects objects<ShaderSourceFile>() {
+        return this->objectsShaderSourceFile;
+    }
+    template <> typename ShaderProgram::Objects objects<ShaderProgram>() {
+        return this->objectsShaderProgram;
+    }
 
-    const char* getObjectNameByID(unsigned int id);
+    template <class C> C* getObjectByID(ObjectID id) {
+        for (auto o : this->template objects<C>()) {
+            if (o->id == id) {
+                return o.get();
+            }
+        }
+        return nullptr;
+    }
 
 private:
     const char* filename;
@@ -24,6 +40,9 @@ private:
     Camera* camera;
     unsigned int vao = 0;
     unsigned int vbo = 0;
+
+    ShaderProgram::Objects objectsShaderProgram;
+    ShaderSourceFile::Objects objectsShaderSourceFile;
 
     void load();
 };

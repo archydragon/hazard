@@ -11,17 +11,18 @@
 
 #include "BaseObject.h"
 
-class ShaderSourceFile : public BaseObject {
+class ShaderSourceFile : public BaseObject<ShaderSourceFile> {
 public:
     ShaderSourceFile();
-    ShaderSourceFile(unsigned int pId, ObjectType pType, const char* pName)
-        : BaseObject(pId, pType, pName){};
+    ShaderSourceFile(ObjectID pId, const char* pName) : BaseObject(pId, pName){};
 
     void load();
+    ObjectType type  = SHADER_SOURCE_FILE;
+    const char* icon = "\xee\x81\x9f";
 
     std::string filename;
-    unsigned int shaderType;
-    unsigned int shader;
+    unsigned int shaderType = UNDEFINED;
+    unsigned int shader     = 0;
 };
 
 // Macros for JSON (de)serialization.

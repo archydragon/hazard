@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+using ObjectID = unsigned int;
+
 enum ObjectType
 {
     UNDEFINED          = 0,
@@ -12,17 +14,22 @@ enum ObjectType
     SHADER_SOURCE_FILE = 20,
 };
 
-class BaseObject {
+template <class T> class BaseObject {
 public:
-    BaseObject();
-    BaseObject(unsigned int pId, ObjectType pType, const char* pName);
+    BaseObject() = default;
+    BaseObject(ObjectID pId, const char* pName) {
+        id   = pId;
+        name = std::string(pName);
+    };
     virtual ~BaseObject() = default;
 
-    unsigned int id;
+    ObjectID id;
     ObjectType type = UNDEFINED;
     std::string name;
-};
 
-typedef std::vector<std::unique_ptr<BaseObject>> Objects;
+    const char* icon = "";
+
+    typedef std::vector<std::shared_ptr<T>> Objects;
+};
 
 #endif // HAZARD_BASEOBJECT_H

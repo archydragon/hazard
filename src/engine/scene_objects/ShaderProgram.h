@@ -7,16 +7,18 @@
 #include "BaseObject.h"
 #include "ShaderSourceFile.h"
 
-class ShaderProgram : public BaseObject {
+class ShaderProgram : public BaseObject<ShaderProgram> {
 public:
     ShaderProgram();
-    ShaderProgram(unsigned int pId, ObjectType pType, const char* pName)
-        : BaseObject(pId, pType, pName){};
+    ShaderProgram(ObjectID pId, const char* pName) : BaseObject(pId, pName){};
 
     void load();
-    void resolveLinks(Objects& objects);
+    void resolveLinks(const ShaderSourceFile::Objects& objects);
     void use() const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+    ObjectType type  = SHADER_PROGRAM;
+    const char* icon = "\xee\x82\xbc";
 
     unsigned int programID            = 0;
     unsigned int vertexShaderFileID   = 0;

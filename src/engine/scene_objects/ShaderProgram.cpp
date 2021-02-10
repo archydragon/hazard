@@ -23,13 +23,13 @@ void ShaderProgram::load() {
     }
 }
 
-void ShaderProgram::resolveLinks(Objects& objects) {
+void ShaderProgram::resolveLinks(const ShaderSourceFile::Objects& objects) {
     for (auto& o : objects) {
         if (o->id == this->vertexShaderFileID) {
-            this->vertexShader             = dynamic_cast<ShaderSourceFile*>(o.get());
+            this->vertexShader             = o.get();
             this->vertexShader->shaderType = GL_VERTEX_SHADER;
         } else if (o->id == this->fragmentShaderFileID) {
-            this->fragmentShader             = dynamic_cast<ShaderSourceFile*>(o.get());
+            this->fragmentShader             = o.get();
             this->fragmentShader->shaderType = GL_FRAGMENT_SHADER;
         }
     }

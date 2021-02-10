@@ -10,8 +10,6 @@
 
 #include "Camera.h"
 #include "Scene.h"
-#include "scene_objects/ShaderProgram.h"
-#include "scene_objects/ShaderSourceFile.h"
 
 using nlohmann::json;
 
@@ -20,28 +18,18 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     screenWidth  = wpWidth;
     screenHeight = wpHeight;
 
-    filename = pFilename;
-    this->load();
+    this->load(pFilename);
 
-    for (auto& o : this->objects) {
-        if (o->type == SHADER_PROGRAM) {
-            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
-            shader->resolveLinks(this->objects);
-        }
+    for (auto& shader : this->objects<ShaderProgram>()) {
+        shader->resolveLinks(this->objects<ShaderSourceFile>());
     }
 
-    for (auto& o : this->objects) {
-        if (o->type == SHADER_SOURCE_FILE) {
-            auto* shader = dynamic_cast<ShaderSourceFile*>(o.get());
-            shader->load();
-        }
+    for (auto& shader : this->objects<ShaderSourceFile>()) {
+        shader->load();
     }
 
-    for (auto& o : this->objects) {
-        if (o->type == SHADER_PROGRAM) {
-            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
-            shader->load();
-        }
+    for (auto& shader : this->objects<ShaderProgram>()) {
+        shader->load();
     }
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -116,15 +104,11 @@ void Scene::draw() {
     mat4 view  = camera->getViewMatrix();
     mat4 model = mat4(0.5f);
 
-    for (auto& o : this->objects) {
-        if (o->type == SHADER_PROGRAM) {
-            auto* shader = dynamic_cast<ShaderProgram*>(o.get());
-
-            shader->use();
-            shader->setMat4("projection", projection);
-            shader->setMat4("view", view);
-            shader->setMat4("model", model);
-        }
+    for (auto& shader : this->objects<ShaderProgram>()) {
+        shader->use();
+        shader->setMat4("projection", projection);
+        shader->setMat4("view", view);
+        shader->setMat4("model", model);
     }
 
     // FIXME: it throws one GL_INVALID_OPERATION error for the very first frame.
@@ -156,22 +140,28 @@ void Scene::load() {
 
         *this->camera = j["camera"].get<Camera>();
         for (auto& it : j["objects"]) {
-            switch (ObjectType(it["type"])) {
+            const ObjectType t = it["type"];
+            switch (t) {
             case UNDEFINED:
                 break;
-            case SHADER_SOURCE_FILE:
-                objects.push_back(std::make_unique<ShaderSourceFile>(it.get<ShaderSourceFile>()));
-                break;
-            case SHADER_PROGRAM:
-                objects.push_back(std::make_unique<ShaderProgram>(it.get<ShaderProgram>()));
+            case SHADER_SOURCE_FILE: {
+                this->objectsShaderSourceFile.push_back(
+                    std::make_shared<ShaderSourceFile>(it.get<ShaderSourceFile>()));
                 break;
             }
+            case SHADER_PROGRAM: {
+                this->objectsShaderProgram.push_back(
+                    std::make_shared<ShaderProgram>(it.get<ShaderProgram>()));
+                break;
+            }
+            }
+            this->objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
 
-        std::cout << "Scene has " << this->objects.size() << " objects." << std::endl;
+        //        std::cout << "Scene has " << this->objects.size() << " objects." << std::endl;
         std::cout << "Scene loaded." << std::endl;
     } else {
-        std::cerr << "Failed to open scene file, using default settings." << std::endl;
+        std::cerr << "Failed to open scene file, using an empty scene." << std::endl;
     }
 }
 
@@ -179,19 +169,16 @@ void Scene::save() {
     json j;
     j["camera"]  = *this->camera;
     j["objects"] = json::array();
-    for (auto& o : this->objects) {
+    for (auto& [id, type] : this->objectMap) {
         json jo;
-        switch (o->type) {
-        case UNDEFINED:
-            break;
+        switch (ObjectType(type)) {
         case SHADER_SOURCE_FILE:
-            jo = (*dynamic_cast<ShaderSourceFile*>(o.get()));
+            j["objects"].push_back(*this->getObjectByID<ShaderSourceFile>(id));
             break;
         case SHADER_PROGRAM:
-            jo = (*dynamic_cast<ShaderProgram*>(o.get()));
+            j["objects"].push_back(*this->getObjectByID<ShaderProgram>(id));
             break;
         }
-        j["objects"].push_back(jo);
     }
 
     std::ofstream ofs(this->filename);
@@ -207,7 +194,7 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
     return types;
 }
 
-void Scene::createObject(int t, const char* n) {
+ObjectID Scene::createObject(int t, const char* name) {
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_int_distribution<int> distribution(1, INT32_MAX);
@@ -216,26 +203,23 @@ void Scene::createObject(int t, const char* n) {
     switch (ObjectType(t)) {
     case UNDEFINED:
         std::cerr << "New object type is not defined." << std::endl;
-        return;
-    case SHADER_SOURCE_FILE:
-        objects.push_back(std::make_unique<ShaderSourceFile>(newId, ObjectType(t), n));
+        return 0;
+    case SHADER_SOURCE_FILE: {
+        auto no = std::make_shared<ShaderSourceFile>(newId, name);
+        this->objectsShaderSourceFile.push_back(no);
         break;
-    case SHADER_PROGRAM:
-        objects.push_back(std::make_unique<ShaderProgram>(newId, ObjectType(t), n));
-        return;
+    }
+    case SHADER_PROGRAM: {
+        this->objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newId, name));
+        break;
+    }
     default:
         std::cerr << "Unsupported object type: " << t << std::endl;
-        return;
+        return 0;
     }
+
+    this->objectMap.insert(std::pair<ObjectID, ObjectType>(newId, ObjectType(t)));
 
     std::cout << "Object (ID = " << newId << ") created." << std::endl;
-}
-
-const char* Scene::getObjectNameByID(unsigned int id) {
-    for (auto& o : this->objects) {
-        if (o->id == id) {
-            return o->name.c_str();
-        }
-    }
-    return nullptr;
+    return newId;
 }
