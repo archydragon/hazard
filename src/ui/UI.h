@@ -29,6 +29,7 @@ private:
     Scene* scene;
     bool windowCamera     = true;
     bool windowObjects    = true;
+    bool windowStats      = true;
     bool windowOpenScene  = false;
     bool windowOpenShader = false;
     bool popupNewObject   = false;

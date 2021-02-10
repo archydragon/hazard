@@ -19,6 +19,7 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     screenHeight = wpHeight;
 
     this->load(pFilename);
+    this->stats = new RenderStats;
 
     for (auto& shader : this->objects<ShaderProgram>()) {
         shader->resolveLinks(this->objects<ShaderSourceFile>());
@@ -99,6 +100,8 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
 }
 
 void Scene::draw() {
+    this->stats->refresh();
+
     mat4 projection =
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     mat4 view  = camera->getViewMatrix();

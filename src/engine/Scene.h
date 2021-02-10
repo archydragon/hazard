@@ -2,6 +2,7 @@
 #define HAZARD_SCENE_H
 
 #include "Camera.h"
+#include "RenderStats.h"
 #include "scene_objects/BaseObject.h"
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
@@ -9,6 +10,7 @@
 class Scene {
 public:
     Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam);
+
     void draw();
     void save();
     void load(const char* pFilename);
@@ -32,6 +34,8 @@ public:
         }
         return nullptr;
     }
+
+    RenderStats* stats;
 
 private:
     const char* filename;

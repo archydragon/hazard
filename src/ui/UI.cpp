@@ -4,6 +4,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
+#include <implot.h>
 
 #include "UI.h"
 
@@ -17,6 +18,7 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
     // IMGUI initialization
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
@@ -47,6 +49,7 @@ UI::UI(GLFWwindow* window, Config* config, Scene* pScene, Camera* pCamera) {
 
 UI::~UI() {
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
 
@@ -72,6 +75,7 @@ void UI::initFrame() {
             if (ImGui::BeginMenu("Window", true)) {
                 ImGui::Checkbox("Objects", &this->windowObjects);
                 ImGui::Checkbox("Camera", &this->windowCamera);
+                ImGui::Checkbox("Stats", &this->windowStats);
                 ImGui::EndMenu();
             }
 
@@ -163,6 +167,27 @@ void UI::initFrame() {
                 ImGui::Checkbox("Freelook", &cameraFreelook);
                 ImGui::SliderFloat3("position", (float*)&camera->position, -20.0f, 20.0f);
                 ImGui::SliderFloat3("front", (float*)&camera->front, -1.0f, 1.0f);
+                ImGui::End();
+            }
+        }
+
+        // Stats window.
+        if (this->windowStats) {
+            ImGui::SetNextWindowPos(ImVec2(0, 500), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(400, 220), ImGuiCond_FirstUseEver);
+            if (ImGui::Begin("Stats", &this->windowStats, ImGuiWindowFlags_NoCollapse)) {
+                ImGui::Text("Frame time graph:");
+                ImPlot::SetNextPlotLimitsX(0, 1000.0f, ImGuiCond_Appearing);
+                ImPlot::SetNextPlotLimitsY(0, this->scene->stats->frameTimeHistory.Max,
+                                           ImGuiCond_Always);
+                if (ImPlot::BeginPlot("##Frametimes", NULL, NULL, ImVec2(-1, 120), 0,
+                                      ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_Lock)) {
+                    ImPlot::PlotLine<double>("", &this->scene->stats->frameTimeHistory.Data[0],
+                                             this->scene->stats->frameTimeHistory.Data.size(), 1, 0,
+                                             this->scene->stats->frameTimeHistory.Offset);
+                    ImPlot::EndPlot();
+                }
+                ImGui::Text("FPS: %d", this->scene->stats->fps);
                 ImGui::End();
             }
         }
