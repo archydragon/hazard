@@ -28,3 +28,12 @@ add_library(${DEP_FILEDIALOG} STATIC
     ${DEP_FILEDIALOG}/ImGuiFileDialog.cpp)
 target_include_directories(${DEP_FILEDIALOG} PUBLIC
     ${DEP_FILEDIALOG})
+
+# implot
+set(DEP_IMPLOT implot)
+include_directories(${DEP_IMGUI})
+add_library(${DEP_IMPLOT} STATIC
+    ${DEP_IMPLOT}/implot.cpp
+    ${DEP_IMPLOT}/implot_items.cpp)
+target_include_directories(${DEP_IMPLOT} PUBLIC
+    ${DEP_IMPLOT})
