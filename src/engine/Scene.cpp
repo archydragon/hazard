@@ -117,7 +117,7 @@ void Scene::draw() {
     // FIXME: it throws one GL_INVALID_OPERATION error for the very first frame.
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::endl;
+        std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::dec << std::endl;
     }
 
     glBindVertexArray(this->vao);

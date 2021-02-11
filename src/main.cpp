@@ -81,7 +81,7 @@ int main() {
 
         scene.draw();
 
-        ui.render();
+        ui.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
