@@ -8,7 +8,7 @@
 std::map<ObjectID, bool> showModals;
 
 // File selector field.
-void fileSelector(const char* key, const char* title, const char* filters, const ObjectID* oid,
+bool fileSelector(const char* key, const char* title, const char* filters, const ObjectID* oid,
                   std::string* field) {
     // It looks hacky but that's how do we create new flags and avoid window blinking.
     if (showModals.find(*oid) == showModals.end()) {
@@ -29,13 +29,16 @@ void fileSelector(const char* key, const char* title, const char* filters, const
         std::string file = UI::dialogOpenFile(key, title, &showModals[*oid], filters);
         if (!file.empty()) {
             *field = file;
+            return true;
         }
     }
+    return false;
 }
 
 // Drop down field to choose from objects which could be linked to parent one.
-void linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targetID,
+bool linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targetID,
                           const std::map<ObjectID, std::string>& links) {
+    bool changed = false;
     static const char* selection;
     for (auto& [id, name] : links) {
         if (id == *targetID) {
@@ -57,6 +60,7 @@ void linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targ
             if (ImGui::Selectable(name.c_str(), is_selected)) {
                 selection = name.c_str();
                 *targetID = id;
+                changed   = true;
             }
             if (is_selected) {
                 ImGui::SetItemDefaultFocus();
@@ -65,6 +69,8 @@ void linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targ
         ImGui::EndCombo();
     }
     ImGui::PopItemWidth();
+
+    return changed;
 }
 
 #endif // HAZARD_FIELDS_H

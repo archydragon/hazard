@@ -7,20 +7,26 @@
 #include "../engine/scene_objects/ShaderSourceFile.h"
 #include "fields.h"
 
-template <class C> void properties(C* obj, Scene* scene);
+// Functions based on this template return true if values have been changed.
+template <class C> bool properties(C* obj, Scene* scene);
 
-template <> void properties<ShaderSourceFile>(ShaderSourceFile* obj, Scene* scene) {
+template <> bool properties<ShaderSourceFile>(ShaderSourceFile* obj, Scene* scene) {
     // Shader source file selector.
-    fileSelector("OpenShader", "Open shader file", ".vert .frag .geom", &obj->id, &obj->filename);
+    return fileSelector("OpenShader", "Open shader file", ".vert .frag .geom", &obj->id,
+                        &obj->filename);
 }
 
-template <> void properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
+template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderSourceFile>();
 
     // Vertex shader selector.
-    linkedObjectSelector("Vertex shader", &obj->id, &obj->links["vertexShaderFileID"], links);
+    bool vs =
+        linkedObjectSelector("Vertex shader", &obj->id, &obj->links["vertexShaderFileID"], links);
     // Fragment shader selector.
-    linkedObjectSelector("Fragment shader", &obj->id, &obj->links["fragmentShaderFileID"], links);
+    bool fs = linkedObjectSelector("Fragment shader", &obj->id, &obj->links["fragmentShaderFileID"],
+                                   links);
+
+    return (vs || fs);
 }
 
 // Selection entrypoint.
@@ -29,10 +35,14 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     case UNDEFINED:
         break;
     case SHADER_PROGRAM:
-        properties<ShaderProgram>(scene->getObjectByID<ShaderProgram>(id), scene);
+        if (properties<ShaderProgram>(scene->getObjectByID<ShaderProgram>(id), scene)) {
+            scene->refreshObject<ShaderProgram>(id);
+        }
         break;
     case SHADER_SOURCE_FILE:
-        properties<ShaderSourceFile>(scene->getObjectByID<ShaderSourceFile>(id), scene);
+        if (properties<ShaderSourceFile>(scene->getObjectByID<ShaderSourceFile>(id), scene)) {
+            scene->refreshObject<ShaderSourceFile>(id);
+        }
         break;
     }
 }

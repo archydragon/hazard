@@ -44,6 +44,11 @@ public:
         return result;
     }
 
+    // TODO: reload object related data only, not the whole scene
+    template <class C> void refreshObject(ObjectID id) {
+        resolveAndInit();
+    }
+
     RenderStats* stats{};
 
 private:
