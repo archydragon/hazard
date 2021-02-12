@@ -16,7 +16,7 @@ public:
     ShaderSourceFile();
     ShaderSourceFile(ObjectID pId, const char* pName) : BaseObject(pId, pName){};
 
-    void load();
+    void init();
     ObjectType type  = SHADER_SOURCE_FILE;
     const char* icon = "\xee\x81\x9f";
 

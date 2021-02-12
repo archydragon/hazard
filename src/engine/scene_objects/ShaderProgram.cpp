@@ -2,17 +2,17 @@
 
 ShaderProgram::ShaderProgram() = default;
 
-void ShaderProgram::load() {
+void ShaderProgram::init() {
     // Attach shaders and link shader program.
-    this->programID = glCreateProgram();
-    glAttachShader(this->programID, this->vertexShader->shader);
-    glAttachShader(this->programID, this->fragmentShader->shader);
-    glLinkProgram(this->programID);
+    programID = glCreateProgram();
+    glAttachShader(programID, vertexShader->shader);
+    glAttachShader(programID, fragmentShader->shader);
+    glLinkProgram(programID);
 
     // Check for errors.
     char log[4096];
     int success;
-    glGetShaderiv(this->programID, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(programID, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(this->programID, 4096, NULL, log);
         std::cerr << "Failed to link shader program." << std::endl
@@ -25,21 +25,22 @@ void ShaderProgram::load() {
 
 void ShaderProgram::resolveLinks(const ShaderSourceFile::Objects& objects) {
     for (auto& o : objects) {
-        if (o->id == this->vertexShaderFileID) {
-            this->vertexShader             = o.get();
-            this->vertexShader->shaderType = GL_VERTEX_SHADER;
-        } else if (o->id == this->fragmentShaderFileID) {
-            this->fragmentShader             = o.get();
-            this->fragmentShader->shaderType = GL_FRAGMENT_SHADER;
+        if (o->id == links["vertexShaderFileID"]) {
+            vertexShader             = o.get();
+            vertexShader->shaderType = GL_VERTEX_SHADER;
+            vertexShader->init();
+        } else if (o->id == links["fragmentShaderFileID"]) {
+            fragmentShader             = o.get();
+            fragmentShader->shaderType = GL_FRAGMENT_SHADER;
+            fragmentShader->init();
         }
     }
 }
 
 void ShaderProgram::use() const {
-    glUseProgram(this->programID);
+    glUseProgram(programID);
 }
 
 void ShaderProgram::setMat4(const std::string& name, const glm::mat4& mat) const {
-    glUniformMatrix4fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE,
-                       &mat[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }

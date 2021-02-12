@@ -26,6 +26,7 @@ public:
     ObjectID id;
     ObjectType type = UNDEFINED;
     std::string name;
+    std::map<std::string, ObjectID> links;
 
     const char* icon = "";
 

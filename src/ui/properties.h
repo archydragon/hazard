@@ -18,9 +18,9 @@ template <> void properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderSourceFile>();
 
     // Vertex shader selector.
-    linkedObjectSelector("Vertex shader", &obj->id, &obj->vertexShaderFileID, links);
+    linkedObjectSelector("Vertex shader", &obj->id, &obj->links["vertexShaderFileID"], links);
     // Fragment shader selector.
-    linkedObjectSelector("Fragment shader", &obj->id, &obj->fragmentShaderFileID, links);
+    linkedObjectSelector("Fragment shader", &obj->id, &obj->links["fragmentShaderFileID"], links);
 }
 
 // Selection entrypoint.

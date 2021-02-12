@@ -270,7 +270,7 @@ void UI::dialogOpenScene() {
     std::string file =
         dialogOpenFile("OpenScene", "Open scene file", &showDialogOpenScene, ".scene");
     if (!file.empty()) {
-        scene->load(file.c_str());
+        scene->loadFromFile(file.c_str());
         config->saveSceneFile(file);
         updateWindowTitle();
     }

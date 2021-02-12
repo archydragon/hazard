@@ -13,25 +13,10 @@
 
 using nlohmann::json;
 
-Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
-    camera       = cam;
-    screenWidth  = wpWidth;
-    screenHeight = wpHeight;
-
-    this->load(pFilename);
-    this->stats = new RenderStats;
-
-    for (auto& shader : this->objects<ShaderProgram>()) {
-        shader->resolveLinks(this->objects<ShaderSourceFile>());
-    }
-
-    for (auto& shader : this->objects<ShaderSourceFile>()) {
-        shader->load();
-    }
-
-    for (auto& shader : this->objects<ShaderProgram>()) {
-        shader->load();
-    }
+Scene::Scene(const char* filename, int screenWidth, int screenHeight, Camera* camera)
+    : filename(filename), screenWidth(screenWidth), screenHeight(screenHeight), camera(camera) {
+    load();
+    stats = new RenderStats;
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -81,13 +66,13 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
     };
     // clang-format on
     // first, configure the cube's VAO (and VBO)
-    glGenVertexArrays(1, &this->vao);
-    glGenBuffers(1, &this->vbo);
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(this->vao);
+    glBindVertexArray(vao);
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -100,14 +85,14 @@ Scene::Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam) {
 }
 
 void Scene::draw() {
-    this->stats->refresh();
+    stats->refresh();
 
     mat4 projection =
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     mat4 view  = camera->getViewMatrix();
     mat4 model = mat4(0.5f);
 
-    for (auto& shader : this->objects<ShaderProgram>()) {
+    for (auto& shader : objects<ShaderProgram>()) {
         shader->use();
         shader->setMat4("projection", projection);
         shader->setMat4("view", view);
@@ -120,14 +105,21 @@ void Scene::draw() {
         std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::dec << std::endl;
     }
 
-    glBindVertexArray(this->vao);
+    glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }
 
-void Scene::load(const char* pFilename) {
-    this->filename = pFilename;
-    this->load();
+void Scene::loadFromFile(const char* pFilename) {
+    filename = pFilename;
+    load();
+}
+
+void Scene::resolveAndInit() {
+    for (auto& shader : objects<ShaderProgram>()) {
+        shader->resolveLinks(objects<ShaderSourceFile>());
+        shader->init();
+    }
 }
 
 // (De)serialization here is done in semi-manual way instead of macros because seems that
@@ -141,50 +133,51 @@ void Scene::load() {
         json j;
         ifs >> j;
 
-        *this->camera = j["camera"].get<Camera>();
+        *camera = j["camera"].get<Camera>();
         for (auto& it : j["objects"]) {
             const ObjectType t = it["type"];
             switch (t) {
             case UNDEFINED:
                 break;
             case SHADER_SOURCE_FILE: {
-                this->objectsShaderSourceFile.push_back(
-                    std::make_shared<ShaderSourceFile>(it.get<ShaderSourceFile>()));
+                auto o = std::make_shared<ShaderSourceFile>(it.get<ShaderSourceFile>());
+                objectsShaderSourceFile.push_back(o);
                 break;
             }
             case SHADER_PROGRAM: {
-                this->objectsShaderProgram.push_back(
-                    std::make_shared<ShaderProgram>(it.get<ShaderProgram>()));
+                auto o = std::make_shared<ShaderProgram>(it.get<ShaderProgram>());
+                objectsShaderProgram.push_back(o);
                 break;
             }
             }
-            this->objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
+            objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
 
-        //        std::cout << "Scene has " << this->objects.size() << " objects." << std::endl;
         std::cout << "Scene loaded." << std::endl;
     } else {
         std::cerr << "Failed to open scene file, using an empty scene." << std::endl;
     }
+
+    resolveAndInit();
 }
 
 void Scene::save() {
     json j;
-    j["camera"]  = *this->camera;
+    j["camera"]  = *camera;
     j["objects"] = json::array();
-    for (auto& [id, type] : this->objectMap) {
+    for (auto& [id, type] : objectMap) {
         json jo;
         switch (ObjectType(type)) {
         case SHADER_SOURCE_FILE:
-            j["objects"].push_back(*this->getObjectByID<ShaderSourceFile>(id));
+            j["objects"].push_back(*getObjectByID<ShaderSourceFile>(id));
             break;
         case SHADER_PROGRAM:
-            j["objects"].push_back(*this->getObjectByID<ShaderProgram>(id));
+            j["objects"].push_back(*getObjectByID<ShaderProgram>(id));
             break;
         }
     }
 
-    std::ofstream ofs(this->filename);
+    std::ofstream ofs(filename);
     ofs << std::setw(4) << j.dump(2) << std::endl;
     std::cout << "Scene saved." << std::endl;
 }
@@ -209,11 +202,11 @@ ObjectID Scene::createObject(int t, const char* name) {
         return 0;
     case SHADER_SOURCE_FILE: {
         auto no = std::make_shared<ShaderSourceFile>(newId, name);
-        this->objectsShaderSourceFile.push_back(no);
+        objectsShaderSourceFile.push_back(no);
         break;
     }
     case SHADER_PROGRAM: {
-        this->objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newId, name));
+        objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newId, name));
         break;
     }
     default:
@@ -221,7 +214,7 @@ ObjectID Scene::createObject(int t, const char* name) {
         return 0;
     }
 
-    this->objectMap.insert(std::pair<ObjectID, ObjectType>(newId, ObjectType(t)));
+    objectMap.insert(std::pair<ObjectID, ObjectType>(newId, ObjectType(t)));
 
     std::cout << "Object (ID = " << newId << ") created." << std::endl;
     return newId;
@@ -229,7 +222,7 @@ ObjectID Scene::createObject(int t, const char* name) {
 
 // This method is being called only by UI so it prefixes object name with its icon, that's all.
 std::string Scene::getObjectDisplayName(ObjectID oid) {
-    for (auto& [id, type] : this->objectMap) {
+    for (auto& [id, type] : objectMap) {
         if (id == oid) {
             switch (ObjectType(type)) {
             case SHADER_SOURCE_FILE: {

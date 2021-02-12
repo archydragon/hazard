@@ -9,11 +9,11 @@
 
 class Scene {
 public:
-    Scene(const char* pFilename, int wpWidth, int wpHeight, Camera* cam);
+    Scene(const char* filename, int screenWidth, int screenHeight, Camera* camera);
 
     void draw();
     void save();
-    void load(const char* pFilename);
+    void loadFromFile(const char* pFilename);
     std::map<ObjectID, ObjectType> objectMap;
     static std::map<ObjectType, std::string> listObjectTypes();
     std::string getObjectDisplayName(ObjectID id);
@@ -44,7 +44,7 @@ public:
         return result;
     }
 
-    RenderStats* stats;
+    RenderStats* stats{};
 
 private:
     const char* filename;
@@ -58,6 +58,7 @@ private:
     ShaderSourceFile::Objects objectsShaderSourceFile;
 
     void load();
+    void resolveAndInit();
 };
 
 #endif // HAZARD_SCENE_H
