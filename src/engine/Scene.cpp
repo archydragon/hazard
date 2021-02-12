@@ -17,71 +17,6 @@ Scene::Scene(const char* filename, int screenWidth, int screenHeight, Camera* ca
     : filename(filename), screenWidth(screenWidth), screenHeight(screenHeight), camera(camera) {
     load();
     stats = new RenderStats;
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    // clang-format off
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-    // clang-format on
-    // first, configure the cube's VAO (and VBO)
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(vao);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 void Scene::draw() {
@@ -89,25 +24,11 @@ void Scene::draw() {
 
     mat4 projection =
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
-    mat4 view  = camera->getViewMatrix();
-    mat4 model = mat4(0.5f);
+    mat4 view = camera->getViewMatrix();
 
-    for (auto& shader : objects<ShaderProgram>()) {
-        shader->use();
-        shader->setMat4("projection", projection);
-        shader->setMat4("view", view);
-        shader->setMat4("model", model);
+    for (auto& o : objects<Cube>()) {
+        stats->drawCalls += o->draw(projection, view);
     }
-
-    // FIXME: it throws one GL_INVALID_OPERATION error for the very first frame.
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cout << "SHADER OpenGL error: 0x" << std::hex << err << std::dec << std::endl;
-    }
-
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 }
 
 void Scene::loadFromFile(const char* pFilename) {
@@ -119,6 +40,10 @@ void Scene::resolveAndInit() {
     for (auto& shader : objects<ShaderProgram>()) {
         shader->resolveLinks(objects<ShaderSourceFile>());
         shader->init();
+    }
+    for (auto& c : objects<Cube>()) {
+        c->resolveLinks(objects<ShaderProgram>());
+        c->init();
     }
 }
 
@@ -149,6 +74,11 @@ void Scene::load() {
                 objectsShaderProgram.push_back(o);
                 break;
             }
+            case CUBE: {
+                auto o = std::make_shared<Cube>(it.get<Cube>());
+                objectsCube.push_back(o);
+                break;
+            }
             }
             objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
@@ -174,6 +104,9 @@ void Scene::save() {
         case SHADER_PROGRAM:
             j["objects"].push_back(*getObjectByID<ShaderProgram>(id));
             break;
+        case CUBE:
+            j["objects"].push_back(*getObjectByID<Cube>(id));
+            break;
         }
     }
 
@@ -187,6 +120,7 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
     types.insert(
         std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
     types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
+    types.insert(std::pair<ObjectType, std::string>(CUBE, "\xee\x80\xa5 Cube"));
     return types;
 }
 
@@ -209,6 +143,10 @@ ObjectID Scene::createObject(int t, const char* name) {
         objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newId, name));
         break;
     }
+    case CUBE: {
+        objectsCube.push_back(std::make_shared<Cube>(newId, name));
+        break;
+    }
     default:
         std::cerr << "Unsupported object type: " << t << std::endl;
         return 0;
@@ -229,9 +167,15 @@ std::string Scene::getObjectDisplayName(ObjectID oid) {
                 auto o = getObjectByID<ShaderSourceFile>(id);
                 return std::string(o->icon) + " " + o->name;
             }
-            case SHADER_PROGRAM:
+            case SHADER_PROGRAM: {
                 auto o = getObjectByID<ShaderProgram>(id);
                 return std::string(o->icon) + " " + o->name;
+            }
+
+            case CUBE: {
+                auto o = getObjectByID<Cube>(id);
+                return std::string(o->icon) + " " + o->name;
+            }
             }
         }
     }

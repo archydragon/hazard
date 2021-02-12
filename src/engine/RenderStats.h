@@ -39,12 +39,14 @@ struct ScrollingBuffer {
 
 class RenderStats {
 public:
-    unsigned int fps = 0;
-    double frameTime = 0;
+    unsigned int fps       = 0;
+    double frameTime       = 0;
+    unsigned int drawCalls = 0;
 
     ScrollingBuffer frameTimeHistory;
 
     void refresh() {
+        drawCalls = 0;
         nFrames++;
         double currentTime = glfwGetTime();
 

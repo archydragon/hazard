@@ -29,6 +29,15 @@ template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     return (vs || fs);
 }
 
+template <> bool properties<Cube>(Cube* obj, Scene* scene) {
+    std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
+    bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
+
+    bool scaled = floatSlider("scale", 0.0f, 10.0f, &obj->id, &obj->scale);
+
+    return (scaled || sp);
+}
+
 // Selection entrypoint.
 void properties(ObjectID id, ObjectType type, Scene* scene) {
     switch (type) {
@@ -42,6 +51,11 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     case SHADER_SOURCE_FILE:
         if (properties<ShaderSourceFile>(scene->getObjectByID<ShaderSourceFile>(id), scene)) {
             scene->refreshObject<ShaderSourceFile>(id);
+        }
+        break;
+    case CUBE:
+        if (properties<Cube>(scene->getObjectByID<Cube>(id), scene)) {
+            scene->refreshObject<Cube>(id);
         }
         break;
     }

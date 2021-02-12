@@ -38,6 +38,10 @@ void ShaderProgram::resolveLinks(const ShaderSourceFile::Objects& objects) {
 }
 
 void ShaderProgram::use() const {
+    if (programID == 0) {
+        std::cerr << "Attempt to use invalid shader program." << std::endl;
+        return;
+    }
     glUseProgram(programID);
 }
 

@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "RenderStats.h"
 #include "scene_objects/BaseObject.h"
+#include "scene_objects/Cube.h"
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
 
@@ -25,6 +26,9 @@ public:
     }
     template <> typename ShaderProgram::Objects objects<ShaderProgram>() {
         return this->objectsShaderProgram;
+    }
+    template <> typename Cube::Objects objects<Cube>() {
+        return this->objectsCube;
     }
 
     template <class C> C* getObjectByID(ObjectID id) {
@@ -61,6 +65,7 @@ private:
 
     ShaderProgram::Objects objectsShaderProgram;
     ShaderSourceFile::Objects objectsShaderSourceFile;
+    Cube::Objects objectsCube;
 
     void load();
     void resolveAndInit();

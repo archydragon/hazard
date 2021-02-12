@@ -1,6 +1,7 @@
 #ifndef HAZARD_BASEOBJECT_H
 #define HAZARD_BASEOBJECT_H
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@ enum ObjectType
     UNDEFINED          = 0,
     SHADER_PROGRAM     = 10,
     SHADER_SOURCE_FILE = 20,
+    CUBE               = 30,
 };
 
 template <class T> class BaseObject {

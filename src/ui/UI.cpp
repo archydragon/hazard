@@ -129,6 +129,7 @@ void UI::windowStats() {
             ImPlot::EndPlot();
         }
         ImGui::Text("FPS: %d", scene->stats->fps);
+        ImGui::Text("Draw calls: %d", scene->stats->drawCalls);
         ImGui::End();
     }
 }

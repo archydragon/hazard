@@ -73,4 +73,9 @@ bool linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targ
     return changed;
 }
 
+// Slider to define float values.
+bool floatSlider(const char* label, float min, float max, const ObjectID* oid, float* value) {
+    return ImGui::DragFloat(label, value, 0.1f, min, max, "%.1f");
+}
+
 #endif // HAZARD_FIELDS_H
