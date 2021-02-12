@@ -19,6 +19,9 @@ public:
 
     bool cameraFreelook = false;
 
+    static std::string dialogOpenFile(const char* key, const char* title, bool* show,
+                                      const char* filters);
+
 private:
     GLFWwindow* window;
     Config* config;
@@ -40,9 +43,8 @@ private:
     bool showWindowObjects = true;
     bool showWindowStats   = true;
     std::map<ObjectID, bool> showWindowProperties;
-    bool showDialogOpenScene  = false;
-    bool showDialogOpenShader = false;
-    bool showPopupNewObject   = false;
+    bool showDialogOpenScene = false;
+    bool showPopupNewObject  = false;
 
     int newObjectType = 0;
     std::string newObjectTypeName;
@@ -50,9 +52,6 @@ private:
     void updateWindowTitle();
     static bool newImGuiWindow(const char* name, bool* p_open, float posX, float posY, float sizeX,
                                float sizeY, ImGuiWindowFlags flags);
-    std::string dialogOpenFile(const char* key, const char* title, bool* show, const char* filters);
-    void propertiesShaderSourceFile(ShaderSourceFile* optr);
-    void propertiesShaderProgram(ShaderProgram* optr);
 };
 
 #endif // HAZARD_UI_H

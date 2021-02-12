@@ -6,9 +6,8 @@
 #include <imgui.h>
 #include <implot.h>
 
-#include "../engine/scene_objects/ShaderProgram.h"
-#include "../engine/scene_objects/ShaderSourceFile.h"
 #include "UI.h"
+#include "properties.h"
 
 namespace fs = std::filesystem;
 
@@ -166,21 +165,10 @@ void UI::windowObjects() {
 
         // Objects list
         for (auto& [id, type] : scene->objectMap) {
-            char itemLine[256] = "";
-            switch (type) {
-            case SHADER_SOURCE_FILE: {
-                auto obj = scene->getObjectByID<ShaderSourceFile>(id);
-                sprintf(itemLine, "%s %s", obj->icon, obj->name.c_str());
-                break;
-            }
-            case SHADER_PROGRAM: {
-                auto obj = scene->getObjectByID<ShaderProgram>(id);
-                sprintf(itemLine, "%s %s", obj->icon, obj->name.c_str());
-                break;
-            }
-            }
+            auto displayName = scene->getObjectDisplayName(id);
 
-            if (ImGui::Selectable(itemLine, false, ImGuiSelectableFlags_AllowDoubleClick)) {
+            if (ImGui::Selectable(displayName.c_str(), false,
+                                  ImGuiSelectableFlags_AllowDoubleClick)) {
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     showWindowProperties[id] = true;
                 }
@@ -196,23 +184,12 @@ void UI::windowsProperties() {
         if (!showWindowProperties[id]) {
             continue;
         }
+
         ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_FirstUseEver);
         char windowTitle[256] = "properties";
-        //            sprintf(windowTitle, "%s - properties",
-        //            this->scene->objects.at(i)->name.c_str());
+        sprintf(windowTitle, "%s - properties", scene->getObjectDisplayName(id).c_str());
         if (ImGui::Begin(windowTitle, &showWindowProperties[id], ImGuiWindowFlags_NoCollapse)) {
-            switch (ObjectType(type)) {
-            case UNDEFINED:
-                break;
-            case SHADER_SOURCE_FILE: {
-                propertiesShaderSourceFile(scene->getObjectByID<ShaderSourceFile>(id));
-                break;
-            }
-            case SHADER_PROGRAM: {
-                propertiesShaderProgram(scene->getObjectByID<ShaderProgram>(id));
-                break;
-            }
-            }
+            properties(id, type, scene);
             ImGui::End();
         }
     }
@@ -330,86 +307,4 @@ void UI::updateWindowTitle() {
     std::string basename = config->sceneFile.substr(config->sceneFile.find_last_of("/\\") + 1);
     sprintf(newTitle, "%s - Hazard", basename.c_str());
     glfwSetWindowTitle(window, newTitle);
-}
-
-void UI::propertiesShaderSourceFile(ShaderSourceFile* optr) {
-    ImGui::Text("File:");
-    ImGui::SameLine();
-    ImGui::InputText("", (char*)(optr->filename.c_str()), 512, ImGuiInputTextFlags_ReadOnly);
-    ImGui::SameLine();
-    if (ImGui::Button("Select")) {
-        showDialogOpenShader = true;
-    }
-
-    // It cannot be hold within Button scope above as all objects created there (including new
-    // windows) exist only within button being clicked scope.
-    if (showDialogOpenShader) {
-        std::string file = dialogOpenFile("OpenShader", "Open shader file", &showDialogOpenShader,
-                                          ".vert .frag .geom");
-        if (!file.empty()) {
-            optr->filename = file;
-        }
-    }
-}
-
-void UI::propertiesShaderProgram(ShaderProgram* optr) {
-    std::map<const char*, unsigned int> objs;
-    for (auto& [id, type] : this->scene->objectMap) {
-        if (type != SHADER_SOURCE_FILE) {
-            continue;
-        }
-        objs.insert(std::pair<const char*, unsigned int>(
-            this->scene->getObjectByID<ShaderSourceFile>(id)->name.c_str(), type));
-    }
-
-    static const char* current_vertex;
-    if (optr->vertexShaderFileID > 0) {
-        current_vertex =
-            this->scene->getObjectByID<ShaderSourceFile>(optr->vertexShaderFileID)->name.c_str();
-    }
-    static const char* current_fragment;
-    if (optr->fragmentShaderFileID > 0) {
-        current_fragment =
-            this->scene->getObjectByID<ShaderSourceFile>(optr->fragmentShaderFileID)->name.c_str();
-    }
-
-    // Vertex shader selector
-    ImGui::Text("Vertex shader:  ");
-    ImGui::SameLine();
-    ImGui::PushItemWidth(180);
-    if (ImGui::BeginCombo("##comboVertex", current_vertex)) {
-        for (auto [name, id] : objs) {
-            bool is_selected;
-            is_selected = current_vertex && (current_vertex == name);
-            if (ImGui::Selectable(name, is_selected)) {
-                current_vertex           = name;
-                optr->vertexShaderFileID = objs.find(name)->second;
-            }
-            if (is_selected) {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-        ImGui::EndCombo();
-    }
-    ImGui::PopItemWidth();
-
-    // Fragment shader selector
-    ImGui::Text("Fragment shader:");
-    ImGui::SameLine();
-    ImGui::PushItemWidth(180);
-    if (ImGui::BeginCombo("##comboFragment", current_fragment)) {
-        for (auto [name, id] : objs) {
-            bool is_selected;
-            is_selected = current_fragment && (current_fragment == name);
-            if (ImGui::Selectable(name, is_selected)) {
-                current_fragment           = name;
-                optr->fragmentShaderFileID = objs.find(name)->second;
-            }
-            if (is_selected) {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-        ImGui::EndCombo();
-    }
-    ImGui::PopItemWidth();
 }

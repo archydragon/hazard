@@ -226,3 +226,21 @@ ObjectID Scene::createObject(int t, const char* name) {
     std::cout << "Object (ID = " << newId << ") created." << std::endl;
     return newId;
 }
+
+// This method is being called only by UI so it prefixes object name with its icon, that's all.
+std::string Scene::getObjectDisplayName(ObjectID oid) {
+    for (auto& [id, type] : this->objectMap) {
+        if (id == oid) {
+            switch (ObjectType(type)) {
+            case SHADER_SOURCE_FILE: {
+                auto o = getObjectByID<ShaderSourceFile>(id);
+                return std::string(o->icon) + " " + o->name;
+            }
+            case SHADER_PROGRAM:
+                auto o = getObjectByID<ShaderProgram>(id);
+                return std::string(o->icon) + " " + o->name;
+            }
+        }
+    }
+    return "";
+}
