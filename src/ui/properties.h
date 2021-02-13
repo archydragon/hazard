@@ -35,7 +35,10 @@ template <> bool properties<Cube>(Cube* obj, Scene* scene) {
 
     bool scaled = floatSlider("scale", 0.0f, 10.0f, &obj->id, &obj->scale);
 
-    return (scaled || sp);
+    bool moved   = vec3Slider("move", -20, 20, &obj->id, &obj->position);
+    bool rotated = vec3Slider("rotate", 0, 360, &obj->id, &obj->rotation);
+
+    return (scaled || sp || moved || rotated);
 }
 
 // Selection entrypoint.

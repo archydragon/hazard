@@ -78,4 +78,9 @@ bool floatSlider(const char* label, float min, float max, const ObjectID* oid, f
     return ImGui::DragFloat(label, value, 0.1f, min, max, "%.1f");
 }
 
+// Slider to define 3-vector float values
+bool vec3Slider(const char* label, float min, float max, const ObjectID* oid, glm::vec3* value) {
+    return ImGui::DragFloat3(label, (float*)value, 0.1f, min, max, "%.1f");
+}
+
 #endif // HAZARD_FIELDS_H

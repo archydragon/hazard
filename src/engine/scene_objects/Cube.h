@@ -3,6 +3,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../../glm2json.h"
 #include "BaseObject.h"
 #include "DrawableObject.h"
 
@@ -20,10 +21,13 @@ public:
     void resolveLinks(const ShaderProgram::Objects& objects);
     unsigned int draw(glm::mat4 projection, glm::mat4 view) override;
 
-    float scale = 1.0f;
+    float scale        = 1.0f;
+    glm::vec3 position = glm::vec3(0.0f);
+    // Rotation contains numbers between 0 and 360 for each axis.
+    glm::vec3 rotation = glm::vec3(0.0f);
 };
 
 // Macros for JSON (de)serialization.
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Cube, id, type, name, links, scale)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Cube, id, type, name, links, scale, position, rotation)
 
 #endif // HAZARD_CUBE_H

@@ -84,8 +84,18 @@ void Cube::resolveLinks(const ShaderProgram::Objects& objects) {
 unsigned int Cube::draw(glm::mat4 projection, glm::mat4 view) {
     unsigned int drawCalls = 0;
 
+    // Init and scale.
     glm::mat4 model = glm::mat4(1.0f);
     model           = glm::scale(model, glm::vec3(scale));
+
+    // Rotate.
+    glm::mat4 rotationMatrix = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0)) *
+                               glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0)) *
+                               glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+    model = model * rotationMatrix;
+
+    // Move.
+    model = translate(model, position);
 
     if (!shader) {
         return 0;
