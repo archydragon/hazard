@@ -14,6 +14,7 @@ enum ObjectType
     SHADER_PROGRAM     = 10,
     SHADER_SOURCE_FILE = 20,
     CUBE               = 30,
+    PLANE              = 31,
 };
 
 template <class T> class BaseObject {

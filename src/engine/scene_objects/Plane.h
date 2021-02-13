@@ -1,5 +1,5 @@
-#ifndef HAZARD_CUBE_H
-#define HAZARD_CUBE_H
+#ifndef HAZARD_PLANE_H
+#define HAZARD_PLANE_H
 
 #include <nlohmann/json.hpp>
 
@@ -7,15 +7,15 @@
 #include "BaseObject.h"
 #include "DrawableObject.h"
 
-class Cube : public DrawableObject, public BaseObject<Cube> {
+class Plane : public DrawableObject, public BaseObject<Plane> {
 public:
-    Cube();
-    Cube(ObjectID id, const char* name) : BaseObject(id, name) {
+    Plane();
+    Plane(ObjectID id, const char* name) : BaseObject(id, name) {
         links.insert(std::pair<std::string, ObjectID>("shaderProgramID", 0));
     };
 
-    ObjectType type  = CUBE;
-    const char* icon = "\xee\x80\xa5";
+    ObjectType type  = PLANE;
+    const char* icon = "\xee\x83\x8b";
 
     void init();
     void resolveLinks(const ShaderProgram::Objects& objects);
@@ -27,6 +27,6 @@ private:
 };
 
 // Macros for JSON (de)serialization.
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Cube, id, type, name, links, scale, position, rotation)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Plane, id, type, name, links, scale, position, rotation)
 
-#endif // HAZARD_CUBE_H
+#endif // HAZARD_PLANE_H

@@ -3,6 +3,11 @@
 ShaderProgram::ShaderProgram() = default;
 
 void ShaderProgram::init() {
+    // Don't try to init if shaders are not resolved and compiled.
+    if (vertexShader == nullptr || fragmentShader == nullptr) {
+        return;
+    }
+
     // Attach shaders and link shader program.
     programID = glCreateProgram();
     glAttachShader(programID, vertexShader->shader);

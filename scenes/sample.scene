@@ -2,13 +2,108 @@
   "camera": {
     "front": [
       -0.375,
-      -0.20800000429153442,
-      0.2240000069141388
+      -0.041999999433755875,
+      0.6729999780654907
     ],
     "position": [
-      7.5,
-      5.0,
-      -1.2239999771118164
+      20.0,
+      14.166999816894531,
+      -11.020000457763672
     ]
-  }
+  },
+  "objects": [
+    {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\cube.frag",
+      "id": 528484528,
+      "name": "fragment shader",
+      "type": 20
+    },
+    {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\cube.vert",
+      "id": 602069656,
+      "name": "vertex shader",
+      "type": 20
+    },
+    {
+      "id": 920208271,
+      "links": {
+        "shaderProgramID": 1214695881
+      },
+      "name": "plane",
+      "position": [
+        -0.8999999761581421,
+        -0.8999999761581421,
+        1.600000023841858
+      ],
+      "rotation": [
+        0.20000000298023224,
+        8.300000190734863,
+        0.0
+      ],
+      "scale": 2.700000047683716,
+      "type": 31
+    },
+    {
+      "id": 1084033228,
+      "links": {
+        "shaderProgramID": 1442546152
+      },
+      "name": "big cube",
+      "position": [
+        -3.799999952316284,
+        1.7000000476837158,
+        2.5
+      ],
+      "rotation": [
+        0.0,
+        51.599998474121094,
+        9.199999809265137
+      ],
+      "scale": 2.0,
+      "type": 30
+    },
+    {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\cube2.frag",
+      "id": 1113239353,
+      "name": "fragment shader 2",
+      "type": 20
+    },
+    {
+      "id": 1214695881,
+      "links": {
+        "fragmentShaderFileID": 528484528,
+        "vertexShaderFileID": 602069656
+      },
+      "name": "plane shader",
+      "type": 10
+    },
+    {
+      "id": 1442546152,
+      "links": {
+        "fragmentShaderFileID": 1113239353,
+        "vertexShaderFileID": 602069656
+      },
+      "name": "cube shader",
+      "type": 10
+    },
+    {
+      "id": 1626951259,
+      "links": {
+        "shaderProgramID": 1442546152
+      },
+      "name": "smol cube",
+      "position": [
+        -20.0,
+        40.0,
+        20.0
+      ],
+      "rotation": [
+        12.899999618530273,
+        35.70000076293945,
+        18.399999618530273
+      ],
+      "scale": 0.8999999761581421,
+      "type": 30
+    }
+  ]
 }

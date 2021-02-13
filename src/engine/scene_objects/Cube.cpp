@@ -5,6 +5,15 @@
 
 Cube::Cube() = default;
 
+void Cube::resolveLinks(const ShaderProgram::Objects& objects) {
+    for (auto& o : objects) {
+        if (o->id == links["shaderProgramID"]) {
+            shader = o.get();
+            break;
+        }
+    }
+}
+
 void Cube::init() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -72,39 +81,8 @@ void Cube::init() {
     glBindVertexArray(0);
 }
 
-void Cube::resolveLinks(const ShaderProgram::Objects& objects) {
-    for (auto& o : objects) {
-        if (o->id == links["shaderProgramID"]) {
-            shader = o.get();
-            break;
-        }
-    }
-}
-
 unsigned int Cube::draw(glm::mat4 projection, glm::mat4 view) {
-    unsigned int drawCalls = 0;
-
-    // Init and scale.
-    glm::mat4 model = glm::mat4(1.0f);
-    model           = glm::scale(model, glm::vec3(scale));
-
-    // Rotate.
-    glm::mat4 rotationMatrix = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0)) *
-                               glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0)) *
-                               glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-    model = model * rotationMatrix;
-
-    // Move.
-    model = translate(model, position);
-
-    if (!shader) {
-        return 0;
-    }
-
-    shader->use();
-    shader->setMat4("projection", projection);
-    shader->setMat4("view", view);
-    shader->setMat4("model", model);
+    unsigned int drawCalls = DrawableObject::draw(projection, view);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -29,16 +29,28 @@ template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     return (vs || fs);
 }
 
-template <> bool properties<Cube>(Cube* obj, Scene* scene) {
+bool drawableCommon(Scene* scene, ObjectID* targetID, ObjectID* shaderID, float* scale,
+                    glm::vec3* position, glm::vec3* rotation) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
-    bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
 
-    bool scaled = floatSlider("scale", 0.0f, 10.0f, &obj->id, &obj->scale);
+    bool sp = linkedObjectSelector("Shader", targetID, shaderID, links);
 
-    bool moved   = vec3Slider("move", -20, 20, &obj->id, &obj->position);
-    bool rotated = vec3Slider("rotate", 0, 360, &obj->id, &obj->rotation);
+    bool scaled = floatSlider("scale", 0.0f, 10.0f, targetID, scale);
+
+    bool moved   = vec3Slider("move", -20, 20, targetID, position);
+    bool rotated = vec3Slider("rotate", 0, 360, targetID, rotation);
 
     return (scaled || sp || moved || rotated);
+}
+
+template <> bool properties<Cube>(Cube* obj, Scene* scene) {
+    return drawableCommon(scene, &obj->id, &obj->links["shaderProgramID"], &obj->scale,
+                          &obj->position, &obj->rotation);
+}
+
+template <> bool properties<Plane>(Plane* obj, Scene* scene) {
+    return drawableCommon(scene, &obj->id, &obj->links["shaderProgramID"], &obj->scale,
+                          &obj->position, &obj->rotation);
 }
 
 // Selection entrypoint.
@@ -59,6 +71,11 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     case CUBE:
         if (properties<Cube>(scene->getObjectByID<Cube>(id), scene)) {
             scene->refreshObject<Cube>(id);
+        }
+        break;
+    case PLANE:
+        if (properties<Plane>(scene->getObjectByID<Plane>(id), scene)) {
+            scene->refreshObject<Plane>(id);
         }
         break;
     }

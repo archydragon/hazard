@@ -29,6 +29,9 @@ void Scene::draw() {
     for (auto& o : objects<Cube>()) {
         stats->drawCalls += o->draw(projection, view);
     }
+    for (auto& o : objects<Plane>()) {
+        stats->drawCalls += o->draw(projection, view);
+    }
 }
 
 void Scene::loadFromFile(const char* pFilename) {
@@ -42,6 +45,10 @@ void Scene::resolveAndInit() {
         shader->init();
     }
     for (auto& c : objects<Cube>()) {
+        c->resolveLinks(objects<ShaderProgram>());
+        c->init();
+    }
+    for (auto& c : objects<Plane>()) {
         c->resolveLinks(objects<ShaderProgram>());
         c->init();
     }
@@ -79,6 +86,11 @@ void Scene::load() {
                 objectsCube.push_back(o);
                 break;
             }
+            case PLANE: {
+                auto o = std::make_shared<Plane>(it.get<Plane>());
+                objectsPlane.push_back(o);
+                break;
+            }
             }
             objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
@@ -107,6 +119,9 @@ void Scene::save() {
         case CUBE:
             j["objects"].push_back(*getObjectByID<Cube>(id));
             break;
+        case PLANE:
+            j["objects"].push_back(*getObjectByID<Plane>(id));
+            break;
         }
     }
 
@@ -121,6 +136,7 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
         std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
     types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
     types.insert(std::pair<ObjectType, std::string>(CUBE, "\xee\x80\xa5 Cube"));
+    types.insert(std::pair<ObjectType, std::string>(PLANE, "\xee\x83\x8b Plane"));
     return types;
 }
 
@@ -145,6 +161,10 @@ ObjectID Scene::createObject(int t, const char* name) {
     }
     case CUBE: {
         objectsCube.push_back(std::make_shared<Cube>(newId, name));
+        break;
+    }
+    case PLANE: {
+        objectsPlane.push_back(std::make_shared<Plane>(newId, name));
         break;
     }
     default:
@@ -174,6 +194,10 @@ std::string Scene::getObjectDisplayName(ObjectID oid) {
 
             case CUBE: {
                 auto o = getObjectByID<Cube>(id);
+                return std::string(o->icon) + " " + o->name;
+            }
+            case PLANE: {
+                auto o = getObjectByID<Plane>(id);
                 return std::string(o->icon) + " " + o->name;
             }
             }

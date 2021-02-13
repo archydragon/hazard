@@ -5,6 +5,7 @@
 #include "RenderStats.h"
 #include "scene_objects/BaseObject.h"
 #include "scene_objects/Cube.h"
+#include "scene_objects/Plane.h"
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
 
@@ -22,13 +23,16 @@ public:
 
     template <class C> typename C::Objects objects();
     template <> typename ShaderSourceFile::Objects objects<ShaderSourceFile>() {
-        return this->objectsShaderSourceFile;
+        return objectsShaderSourceFile;
     }
     template <> typename ShaderProgram::Objects objects<ShaderProgram>() {
-        return this->objectsShaderProgram;
+        return objectsShaderProgram;
     }
     template <> typename Cube::Objects objects<Cube>() {
-        return this->objectsCube;
+        return objectsCube;
+    }
+    template <> typename Plane::Objects objects<Plane>() {
+        return objectsPlane;
     }
 
     template <class C> C* getObjectByID(ObjectID id) {
@@ -42,7 +46,7 @@ public:
 
     template <class C> std::map<ObjectID, std::string> getObjectsNames() {
         std::map<ObjectID, std::string> result;
-        for (auto o : this->template objects<C>()) {
+        for (auto o : objects<C>()) {
             result.insert(std::pair<ObjectID, std::string>(o->id, o->name));
         }
         return result;
@@ -65,6 +69,7 @@ private:
     ShaderProgram::Objects objectsShaderProgram;
     ShaderSourceFile::Objects objectsShaderSourceFile;
     Cube::Objects objectsCube;
+    Plane::Objects objectsPlane;
 
     void load();
     void resolveAndInit();
