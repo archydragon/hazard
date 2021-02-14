@@ -6,12 +6,18 @@
       0.061000000685453415
     ],
     "position": [
-      -15.0,
+      -9.166999816894531,
       5.833000183105469,
-      -3.6730000972747803
+      -4.489999771118164
     ]
   },
   "objects": [
+    {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\textured.frag",
+      "id": 39419291,
+      "name": "textured fs",
+      "type": 20
+    },
     {
       "drawableType": 1002,
       "id": 144274233,
@@ -29,8 +35,18 @@
         0.0,
         0.0
       ],
-      "scale": 20.0,
+      "scale": 15.0,
       "type": 1000
+    },
+    {
+      "id": 425692270,
+      "links": {
+        "fragmentShaderFileID": 39419291,
+        "textureID": 1162280326,
+        "vertexShaderFileID": 919986189
+      },
+      "name": "textured",
+      "type": 10
     },
     {
       "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\cube.frag",
@@ -45,15 +61,28 @@
       "type": 20
     },
     {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\textured.vert",
+      "id": 919986189,
+      "name": "textured vs",
+      "type": 20
+    },
+    {
       "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\shaders\\cube2.frag",
       "id": 1113239353,
       "name": "fragment shader 2",
       "type": 20
     },
     {
+      "filename": "C:\\Users\\archy\\ws\\hazard\\assets\\textures\\floor.png",
+      "id": 1162280326,
+      "name": "wood",
+      "type": 30
+    },
+    {
       "id": 1214695881,
       "links": {
         "fragmentShaderFileID": 528484528,
+        "textureID": 0,
         "vertexShaderFileID": 602069656
       },
       "name": "plane shader",
@@ -63,6 +92,7 @@
       "id": 1442546152,
       "links": {
         "fragmentShaderFileID": 1113239353,
+        "textureID": 0,
         "vertexShaderFileID": 602069656
       },
       "name": "cube shader",
@@ -72,7 +102,7 @@
       "drawableType": 1001,
       "id": 1763344493,
       "links": {
-        "shaderProgramID": 1442546152
+        "shaderProgramID": 425692270
       },
       "name": "big cube",
       "position": [

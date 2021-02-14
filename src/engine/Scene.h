@@ -7,6 +7,7 @@
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
 #include "scene_objects/TSceneObject.h"
+#include "scene_objects/Texture.h"
 
 class Scene {
 public:
@@ -29,6 +30,9 @@ public:
     }
     template <> typename Drawable::Objects objects<Drawable>() {
         return objectsDrawable;
+    }
+    template <> typename Texture::Objects objects<Texture>() {
+        return objectsTexture;
     }
 
     template <class C> C* getObjectByID(ObjectID id) {
@@ -59,12 +63,11 @@ private:
     int screenWidth;
     int screenHeight;
     Camera* camera;
-    unsigned int vao = 0;
-    unsigned int vbo = 0;
 
     ShaderProgram::Objects objectsShaderProgram;
     ShaderSourceFile::Objects objectsShaderSourceFile;
     Drawable::Objects objectsDrawable;
+    Texture::Objects objectsTexture;
 
     void load();
     void resolveAndInit();

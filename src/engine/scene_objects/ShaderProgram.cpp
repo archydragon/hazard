@@ -42,14 +42,34 @@ void ShaderProgram::resolveLinks(const ShaderSourceFile::Objects& objects) {
     }
 }
 
+void ShaderProgram::resolveLinks(const Texture::Objects& objects) {
+    for (auto& o : objects) {
+        if (o->id == links["textureID"]) {
+            textureDiffuse = o.get();
+            textureDiffuse->init();
+            break;
+        }
+    }
+}
+
 void ShaderProgram::use() const {
     if (programID == 0) {
         std::cerr << "Attempt to use invalid shader program." << std::endl;
         return;
     }
     glUseProgram(programID);
+    // TODO: cleanup
+    if (textureDiffuse) {
+        glActiveTexture(GL_TEXTURE0 + textureDiffuse->textureID);
+        setInt("texture_diffuse", textureDiffuse->textureID);
+        glBindTexture(GL_TEXTURE_2D, textureDiffuse->textureID);
+    }
 }
 
 void ShaderProgram::setMat4(const std::string& name, const glm::mat4& mat) const {
     glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void ShaderProgram::setInt(const std::string& name, int value) const {
+    glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
 }

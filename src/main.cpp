@@ -57,7 +57,9 @@ int main() {
         return -1;
     }
 
-    // Enable OpenGL debug logs.
+    glEnable(GL_DEPTH_TEST);
+
+    // OpenGL debug logs.
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(glMessageCallback, 0);
 

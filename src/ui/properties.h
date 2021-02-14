@@ -17,8 +17,8 @@ template <> bool properties<ShaderSourceFile>(ShaderSourceFile* obj, Scene* scen
 }
 
 template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
+    // Shader selection.
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderSourceFile>();
-
     // Vertex shader selector.
     bool vs =
         linkedObjectSelector("Vertex shader", &obj->id, &obj->links["vertexShaderFileID"], links);
@@ -26,26 +26,30 @@ template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     bool fs = linkedObjectSelector("Fragment shader", &obj->id, &obj->links["fragmentShaderFileID"],
                                    links);
 
-    return (vs || fs);
+    // Texture selection.
+    links   = scene->getObjectsNames<Texture>();
+    bool ts = linkedObjectSelector("Texture", &obj->id, &obj->links["textureID"], links);
+
+    return (vs || fs || ts);
 }
 
-bool drawableCommon(Scene* scene, ObjectID* targetID, ObjectID* shaderID, float* scale,
-                    glm::vec3* position, glm::vec3* rotation) {
+template <> bool properties<Drawable>(Drawable* obj, Scene* scene) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
 
-    bool sp = linkedObjectSelector("Shader", targetID, shaderID, links);
+    bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
 
-    bool scaled = floatSlider("scale", 0.0f, 50.0f, targetID, scale);
+    bool scaled = floatSlider("scale", 0.0f, 50.0f, &obj->id, &obj->scale);
 
-    bool moved   = vec3Slider("move", -20, 20, targetID, position);
-    bool rotated = vec3Slider("rotate", 0, 360, targetID, rotation);
+    bool moved   = vec3Slider("move", -20, 20, &obj->id, &obj->position);
+    bool rotated = vec3Slider("rotate", 0, 360, &obj->id, &obj->rotation);
 
     return (scaled || sp || moved || rotated);
 }
 
-template <> bool properties<Drawable>(Drawable* obj, Scene* scene) {
-    return drawableCommon(scene, &obj->id, &obj->links["shaderProgramID"], &obj->scale,
-                          &obj->position, &obj->rotation);
+template <> bool properties<Texture>(Texture* obj, Scene* scene) {
+    // Shader source file selector.
+    return fileSelector("OpenTexture", "Open texture image", ".png .jpeg .jpg .bmp .tga", &obj->id,
+                        &obj->filename);
 }
 
 // Selection entrypoint.
@@ -66,6 +70,11 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     case DRAWABLE:
         if (properties<Drawable>(scene->getObjectByID<Drawable>(id), scene)) {
             scene->refreshObject<Drawable>(id);
+        }
+        break;
+    case TEXTURE:
+        if (properties<Texture>(scene->getObjectByID<Texture>(id), scene)) {
+            scene->refreshObject<Texture>(id);
         }
         break;
     }

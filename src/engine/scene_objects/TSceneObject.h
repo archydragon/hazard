@@ -13,6 +13,7 @@ enum ObjectType
     UNDEFINED          = 0,
     SHADER_PROGRAM     = 10,
     SHADER_SOURCE_FILE = 20,
+    TEXTURE            = 30,
     DRAWABLE           = 1000,
 };
 

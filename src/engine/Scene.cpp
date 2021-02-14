@@ -19,6 +19,15 @@ Scene::Scene(const char* filename, int screenWidth, int screenHeight, Camera* ca
     stats = new RenderStats;
 }
 
+std::map<ObjectType, std::string> Scene::listObjectTypes() {
+    std::map<ObjectType, std::string> types;
+    types.insert(
+        std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
+    types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
+    types.insert(std::pair<ObjectType, std::string>(TEXTURE, "\xee\x81\xb5 Texture"));
+    return types;
+}
+
 void Scene::draw() {
     stats->refresh();
 
@@ -39,6 +48,7 @@ void Scene::loadFromFile(const char* pFilename) {
 void Scene::resolveAndInit() {
     for (auto& shader : objects<ShaderProgram>()) {
         shader->resolveLinks(objects<ShaderSourceFile>());
+        shader->resolveLinks(objects<Texture>());
         shader->init();
     }
     for (auto& c : objects<Drawable>()) {
@@ -80,6 +90,11 @@ void Scene::load() {
                 objectsDrawable.push_back(o);
                 break;
             }
+            case TEXTURE: {
+                auto o = std::make_shared<Texture>(it.get<Texture>());
+                objectsTexture.push_back(o);
+                break;
+            }
             }
             objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
@@ -108,22 +123,15 @@ void Scene::save() {
         case DRAWABLE:
             j["objects"].push_back(*getObjectByID<Drawable>(id));
             break;
+        case TEXTURE:
+            j["objects"].push_back(*getObjectByID<Texture>(id));
+            break;
         }
     }
 
     std::ofstream ofs(filename);
     ofs << std::setw(4) << j.dump(2) << std::endl;
     std::cout << "Scene saved." << std::endl;
-}
-
-std::map<ObjectType, std::string> Scene::listObjectTypes() {
-    std::map<ObjectType, std::string> types;
-    types.insert(
-        std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
-    types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
-    //    types.insert(std::pair<ObjectType, std::string>(CUBE, "\xee\x80\xa5 Cube"));
-    //    types.insert(std::pair<ObjectType, std::string>(PLANE, "\xee\x83\x8b Plane"));
-    return types;
 }
 
 ObjectID Scene::createObject(int t, const char* name) {
@@ -155,6 +163,10 @@ ObjectID Scene::createObject(int t, const char* name) {
     case DRAWABLE: {
         break;
     }
+    case TEXTURE: {
+        objectsTexture.push_back(std::make_shared<Texture>(newID, name));
+        break;
+    }
     default:
         std::cerr << "Unsupported object type: " << t << std::endl;
         return 0;
@@ -181,6 +193,10 @@ std::string Scene::getObjectDisplayName(ObjectID oid) {
             }
             case DRAWABLE: {
                 auto o = getObjectByID<Drawable>(id);
+                return std::string(o->icon) + " " + o->name;
+            }
+            case TEXTURE: {
+                auto o = getObjectByID<Texture>(id);
                 return std::string(o->icon) + " " + o->name;
             }
             }
