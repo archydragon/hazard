@@ -44,11 +44,11 @@ void Scene::resolveAndInit() {
         shader->resolveLinks(objects<ShaderSourceFile>());
         shader->init();
     }
-    for (auto& c : objects<Cube>()) {
+    for (auto& c : objects<Plane>()) {
         c->resolveLinks(objects<ShaderProgram>());
         c->init();
     }
-    for (auto& c : objects<Plane>()) {
+    for (auto& c : objects<Cube>()) {
         c->resolveLinks(objects<ShaderProgram>());
         c->init();
     }

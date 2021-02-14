@@ -2,6 +2,7 @@
 #define HAZARD_DRAWABLEOBJECT_H
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "ShaderProgram.h"
 
@@ -16,19 +17,25 @@ public:
     glm::vec3 rotation = glm::vec3(0.0f);
 
     virtual unsigned int draw(glm::mat4 projection, glm::mat4 view) {
-        // Init and scale.
+        // Init.
         glm::mat4 model = glm::mat4(1.0f);
-        model           = glm::scale(model, glm::vec3(scale));
+
+        // Move.
+        model = glm::translate(model, position);
 
         // Rotate.
         glm::mat4 rotationMatrix =
             glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0)) *
             glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0)) *
             glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-        model = model * rotationMatrix;
+        glm::mat4 translate    = glm::translate(glm::mat4(1.0), position);
+        glm::mat4 invTranslate = glm::inverse(translate);
 
-        // Move.
-        model = translate(model, position);
+        glm::mat4 transform = translate * rotationMatrix * invTranslate;
+        model               = transform * model;
+
+        // Scale.
+        model = glm::scale(model, glm::vec3(scale));
 
         if (!shader) {
             return 0;

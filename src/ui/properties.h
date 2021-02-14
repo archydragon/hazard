@@ -35,7 +35,7 @@ bool drawableCommon(Scene* scene, ObjectID* targetID, ObjectID* shaderID, float*
 
     bool sp = linkedObjectSelector("Shader", targetID, shaderID, links);
 
-    bool scaled = floatSlider("scale", 0.0f, 10.0f, targetID, scale);
+    bool scaled = floatSlider("scale", 0.0f, 50.0f, targetID, scale);
 
     bool moved   = vec3Slider("move", -20, 20, targetID, position);
     bool rotated = vec3Slider("rotate", 0, 360, targetID, rotation);
