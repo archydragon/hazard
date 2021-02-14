@@ -119,7 +119,7 @@ bool UI::newImGuiWindow(const char* name, bool* show, float posX, float posY, fl
 void UI::windowStats() {
     if (newImGuiWindow("Stats", &showWindowStats, 0, 500, 400, 220)) {
         ImGui::Text("Frame time graph:");
-        ImPlot::SetNextPlotLimitsX(0, 1000.0f, ImGuiCond_Appearing);
+        ImPlot::SetNextPlotLimitsX(0, 300.0f, ImGuiCond_Appearing);
         ImPlot::SetNextPlotLimitsY(0, scene->stats->frameTimeHistory.Max, ImGuiCond_Always);
         if (ImPlot::BeginPlot("##Frametimes", NULL, NULL, ImVec2(-1, 120), 0,
                               ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_Lock)) {

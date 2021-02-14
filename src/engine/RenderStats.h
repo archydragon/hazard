@@ -11,7 +11,7 @@ struct ScrollingBuffer {
     int lastMax = 0;
 
     ScrollingBuffer() {
-        MaxSize = 1000;
+        MaxSize = 300;
         Offset  = 0;
         Data.reserve(MaxSize);
         AddPoint(0);
