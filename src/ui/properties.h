@@ -43,12 +43,7 @@ bool drawableCommon(Scene* scene, ObjectID* targetID, ObjectID* shaderID, float*
     return (scaled || sp || moved || rotated);
 }
 
-template <> bool properties<Cube>(Cube* obj, Scene* scene) {
-    return drawableCommon(scene, &obj->id, &obj->links["shaderProgramID"], &obj->scale,
-                          &obj->position, &obj->rotation);
-}
-
-template <> bool properties<Plane>(Plane* obj, Scene* scene) {
+template <> bool properties<Drawable>(Drawable* obj, Scene* scene) {
     return drawableCommon(scene, &obj->id, &obj->links["shaderProgramID"], &obj->scale,
                           &obj->position, &obj->rotation);
 }
@@ -68,14 +63,9 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
             scene->refreshObject<ShaderSourceFile>(id);
         }
         break;
-    case CUBE:
-        if (properties<Cube>(scene->getObjectByID<Cube>(id), scene)) {
-            scene->refreshObject<Cube>(id);
-        }
-        break;
-    case PLANE:
-        if (properties<Plane>(scene->getObjectByID<Plane>(id), scene)) {
-            scene->refreshObject<Plane>(id);
+    case DRAWABLE:
+        if (properties<Drawable>(scene->getObjectByID<Drawable>(id), scene)) {
+            scene->refreshObject<Drawable>(id);
         }
         break;
     }

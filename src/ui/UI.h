@@ -8,7 +8,8 @@
 #include "../Config.h"
 #include "../engine/Camera.h"
 #include "../engine/Scene.h"
-#include "../engine/scene_objects/BaseObject.h"
+#include "../engine/scene_objects/Drawable.h"
+#include "../engine/scene_objects/TSceneObject.h"
 
 class UI {
 public:

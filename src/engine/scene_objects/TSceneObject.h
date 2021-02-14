@@ -1,5 +1,5 @@
-#ifndef HAZARD_BASEOBJECT_H
-#define HAZARD_BASEOBJECT_H
+#ifndef HAZARD_TSCENEOBJECT_H
+#define HAZARD_TSCENEOBJECT_H
 
 #include <map>
 #include <memory>
@@ -13,18 +13,14 @@ enum ObjectType
     UNDEFINED          = 0,
     SHADER_PROGRAM     = 10,
     SHADER_SOURCE_FILE = 20,
-    CUBE               = 30,
-    PLANE              = 31,
+    DRAWABLE           = 1000,
 };
 
-template <class T> class BaseObject {
+template <class T> class TSceneObject {
 public:
-    BaseObject() = default;
-    BaseObject(ObjectID pId, const char* pName) {
-        id   = pId;
-        name = std::string(pName);
-    };
-    virtual ~BaseObject() = default;
+    TSceneObject() = default;
+    TSceneObject(ObjectID id, const char* name) : id(id), name(name){};
+    virtual ~TSceneObject() = default;
 
     ObjectID id;
     ObjectType type = UNDEFINED;
@@ -36,4 +32,4 @@ public:
     typedef std::vector<std::shared_ptr<T>> Objects;
 };
 
-#endif // HAZARD_BASEOBJECT_H
+#endif // HAZARD_TSCENEOBJECT_H

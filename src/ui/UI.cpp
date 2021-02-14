@@ -159,6 +159,14 @@ void UI::windowObjects() {
                         showPopupNewObject = true;
                     }
                 }
+                ImGui::Separator();
+                for (auto& [type, name] : Drawable::listObjectTypes()) {
+                    if (ImGui::MenuItem(name.c_str())) {
+                        newObjectType      = type;
+                        newObjectTypeName  = name;
+                        showPopupNewObject = true;
+                    }
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();

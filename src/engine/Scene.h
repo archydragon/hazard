@@ -3,11 +3,10 @@
 
 #include "Camera.h"
 #include "RenderStats.h"
-#include "scene_objects/BaseObject.h"
-#include "scene_objects/Cube.h"
-#include "scene_objects/Plane.h"
+#include "scene_objects/Drawable.h"
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
+#include "scene_objects/TSceneObject.h"
 
 class Scene {
 public:
@@ -28,11 +27,8 @@ public:
     template <> typename ShaderProgram::Objects objects<ShaderProgram>() {
         return objectsShaderProgram;
     }
-    template <> typename Cube::Objects objects<Cube>() {
-        return objectsCube;
-    }
-    template <> typename Plane::Objects objects<Plane>() {
-        return objectsPlane;
+    template <> typename Drawable::Objects objects<Drawable>() {
+        return objectsDrawable;
     }
 
     template <class C> C* getObjectByID(ObjectID id) {
@@ -68,8 +64,7 @@ private:
 
     ShaderProgram::Objects objectsShaderProgram;
     ShaderSourceFile::Objects objectsShaderSourceFile;
-    Cube::Objects objectsCube;
-    Plane::Objects objectsPlane;
+    Drawable::Objects objectsDrawable;
 
     void load();
     void resolveAndInit();

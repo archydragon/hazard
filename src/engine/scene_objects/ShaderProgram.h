@@ -4,13 +4,13 @@
 #include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
-#include "BaseObject.h"
 #include "ShaderSourceFile.h"
+#include "TSceneObject.h"
 
-class ShaderProgram : public BaseObject<ShaderProgram> {
+class ShaderProgram : public TSceneObject<ShaderProgram> {
 public:
     ShaderProgram();
-    ShaderProgram(ObjectID pId, const char* pName) : BaseObject(pId, pName) {
+    ShaderProgram(ObjectID pId, const char* pName) : TSceneObject(pId, pName) {
         links.insert(std::pair<std::string, ObjectID>("vertexShaderFileID", 0));
         links.insert(std::pair<std::string, ObjectID>("fragmentShaderFileID", 0));
     };

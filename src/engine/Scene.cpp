@@ -26,10 +26,7 @@ void Scene::draw() {
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     mat4 view = camera->getViewMatrix();
 
-    for (auto& o : objects<Cube>()) {
-        stats->drawCalls += o->draw(projection, view);
-    }
-    for (auto& o : objects<Plane>()) {
+    for (auto& o : objects<Drawable>()) {
         stats->drawCalls += o->draw(projection, view);
     }
 }
@@ -44,11 +41,7 @@ void Scene::resolveAndInit() {
         shader->resolveLinks(objects<ShaderSourceFile>());
         shader->init();
     }
-    for (auto& c : objects<Plane>()) {
-        c->resolveLinks(objects<ShaderProgram>());
-        c->init();
-    }
-    for (auto& c : objects<Cube>()) {
+    for (auto& c : objects<Drawable>()) {
         c->resolveLinks(objects<ShaderProgram>());
         c->init();
     }
@@ -81,14 +74,10 @@ void Scene::load() {
                 objectsShaderProgram.push_back(o);
                 break;
             }
-            case CUBE: {
-                auto o = std::make_shared<Cube>(it.get<Cube>());
-                objectsCube.push_back(o);
-                break;
-            }
-            case PLANE: {
-                auto o = std::make_shared<Plane>(it.get<Plane>());
-                objectsPlane.push_back(o);
+            case DRAWABLE: {
+                auto o = std::make_shared<Drawable>(it.get<Drawable>());
+                std::cout << o.get()->drawableType << std::endl;
+                objectsDrawable.push_back(o);
                 break;
             }
             }
@@ -116,11 +105,8 @@ void Scene::save() {
         case SHADER_PROGRAM:
             j["objects"].push_back(*getObjectByID<ShaderProgram>(id));
             break;
-        case CUBE:
-            j["objects"].push_back(*getObjectByID<Cube>(id));
-            break;
-        case PLANE:
-            j["objects"].push_back(*getObjectByID<Plane>(id));
+        case DRAWABLE:
+            j["objects"].push_back(*getObjectByID<Drawable>(id));
             break;
         }
     }
@@ -135,8 +121,8 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
     types.insert(
         std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
     types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
-    types.insert(std::pair<ObjectType, std::string>(CUBE, "\xee\x80\xa5 Cube"));
-    types.insert(std::pair<ObjectType, std::string>(PLANE, "\xee\x83\x8b Plane"));
+    //    types.insert(std::pair<ObjectType, std::string>(CUBE, "\xee\x80\xa5 Cube"));
+    //    types.insert(std::pair<ObjectType, std::string>(PLANE, "\xee\x83\x8b Plane"));
     return types;
 }
 
@@ -144,27 +130,29 @@ ObjectID Scene::createObject(int t, const char* name) {
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_int_distribution<int> distribution(1, INT32_MAX);
+    int newID = distribution(generator);
 
-    int newId = distribution(generator);
+    if (t > DRAWABLE) {
+        auto o          = std::make_shared<Drawable>(newID, name);
+        o->drawableType = DrawableType(t);
+        objectsDrawable.push_back(o);
+        t = DRAWABLE;
+    }
+
     switch (ObjectType(t)) {
     case UNDEFINED:
         std::cerr << "New object type is not defined." << std::endl;
         return 0;
     case SHADER_SOURCE_FILE: {
-        auto no = std::make_shared<ShaderSourceFile>(newId, name);
+        auto no = std::make_shared<ShaderSourceFile>(newID, name);
         objectsShaderSourceFile.push_back(no);
         break;
     }
     case SHADER_PROGRAM: {
-        objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newId, name));
+        objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newID, name));
         break;
     }
-    case CUBE: {
-        objectsCube.push_back(std::make_shared<Cube>(newId, name));
-        break;
-    }
-    case PLANE: {
-        objectsPlane.push_back(std::make_shared<Plane>(newId, name));
+    case DRAWABLE: {
         break;
     }
     default:
@@ -172,10 +160,10 @@ ObjectID Scene::createObject(int t, const char* name) {
         return 0;
     }
 
-    objectMap.insert(std::pair<ObjectID, ObjectType>(newId, ObjectType(t)));
+    objectMap.insert(std::pair<ObjectID, ObjectType>(newID, ObjectType(t)));
 
-    std::cout << "Object (ID = " << newId << ") created." << std::endl;
-    return newId;
+    std::cout << "Object (ID = " << newID << ") created." << std::endl;
+    return newID;
 }
 
 // This method is being called only by UI so it prefixes object name with its icon, that's all.
@@ -191,13 +179,8 @@ std::string Scene::getObjectDisplayName(ObjectID oid) {
                 auto o = getObjectByID<ShaderProgram>(id);
                 return std::string(o->icon) + " " + o->name;
             }
-
-            case CUBE: {
-                auto o = getObjectByID<Cube>(id);
-                return std::string(o->icon) + " " + o->name;
-            }
-            case PLANE: {
-                auto o = getObjectByID<Plane>(id);
+            case DRAWABLE: {
+                auto o = getObjectByID<Drawable>(id);
                 return std::string(o->icon) + " " + o->name;
             }
             }

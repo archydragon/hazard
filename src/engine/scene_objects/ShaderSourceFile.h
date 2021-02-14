@@ -9,12 +9,12 @@
 #include <glad/glad.h>
 #include <nlohmann/json.hpp>
 
-#include "BaseObject.h"
+#include "TSceneObject.h"
 
-class ShaderSourceFile : public BaseObject<ShaderSourceFile> {
+class ShaderSourceFile : public TSceneObject<ShaderSourceFile> {
 public:
     ShaderSourceFile();
-    ShaderSourceFile(ObjectID pId, const char* pName) : BaseObject(pId, pName){};
+    ShaderSourceFile(ObjectID pId, const char* pName) : TSceneObject(pId, pName){};
 
     void init();
     ObjectType type  = SHADER_SOURCE_FILE;
