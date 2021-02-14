@@ -3,9 +3,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm2json.h>
 #include <nlohmann/json.hpp>
 
-#include "../../glm2json.h"
 #include "ShaderProgram.h"
 #include "TSceneObject.h"
 #include "drawables/Cube.h"

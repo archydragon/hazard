@@ -12,7 +12,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 
-add_executable(${PROJECT} src/main.cpp src/Config.cpp src/Config.h src/ui/UI.cpp src/ui/UI.h src/engine/Camera.cpp src/engine/Camera.h src/engine/Scene.cpp src/engine/Scene.h src/glm2json.h src/engine/scene_objects/TSceneObject.h src/engine/scene_objects/ShaderSourceFile.cpp src/engine/scene_objects/ShaderSourceFile.h src/engine/scene_objects/ShaderProgram.cpp src/engine/scene_objects/ShaderProgram.h src/engine/RenderStats.h src/ui/properties.h src/ui/fields.h src/engine/scene_objects/Drawable.h src/engine/scene_objects/Drawable.cpp src/engine/scene_objects/drawables/IDrawable.h src/engine/scene_objects/drawables/Cube.h src/engine/scene_objects/drawables/Plane.h)
+add_executable(${PROJECT} src/main.cpp src/Config.cpp src/Config.h src/ui/UI.cpp src/ui/UI.h src/engine/Camera.cpp src/engine/Camera.h src/engine/Scene.cpp src/engine/Scene.h src/engine/scene_objects/TSceneObject.h src/engine/scene_objects/ShaderSourceFile.cpp src/engine/scene_objects/ShaderSourceFile.h src/engine/scene_objects/ShaderProgram.cpp src/engine/scene_objects/ShaderProgram.h src/engine/RenderStats.h src/ui/properties.h src/ui/fields.h src/engine/scene_objects/Drawable.h src/engine/scene_objects/Drawable.cpp src/engine/scene_objects/drawables/IDrawable.h src/engine/scene_objects/drawables/Cube.h src/engine/scene_objects/drawables/Plane.h)
+target_include_directories(${PROJECT} PRIVATE include)
 
 # Add CMakeLists.txt for 3rd party libs
 add_subdirectory(3rdparty)

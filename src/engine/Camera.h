@@ -2,8 +2,7 @@
 #define HAZARD_CAMERA_H
 
 #include <glm/glm.hpp>
-
-#include "../glm2json.h"
+#include <glm2json.h>
 
 using namespace glm;
 
