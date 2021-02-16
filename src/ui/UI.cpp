@@ -194,7 +194,7 @@ void UI::windowsProperties() {
             continue;
         }
 
-        ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(350, 300), ImGuiCond_FirstUseEver);
         char windowTitle[256] = "properties";
         sprintf(windowTitle, "%s - properties", scene->getObjectDisplayName(id).c_str());
         if (ImGui::Begin(windowTitle, &showWindowProperties[id], ImGuiWindowFlags_NoCollapse)) {
