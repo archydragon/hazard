@@ -9,16 +9,18 @@
 #include <glad/glad.h>
 #include <nlohmann/json.hpp>
 
-#include "TSceneObject.h"
+#include "ISceneObject.h"
 
-class ShaderSourceFile : public TSceneObject<ShaderSourceFile> {
+class ShaderSourceFile : public ISceneObject {
 public:
     ShaderSourceFile();
-    ShaderSourceFile(ObjectID pId, const char* pName) : TSceneObject(pId, pName){};
+    ShaderSourceFile(ObjectID pId, const char* pName) : ISceneObject(pId, pName){};
 
-    void init();
-    ObjectType type  = SHADER_SOURCE_FILE;
-    const char* icon = "\xee\x81\x9f";
+    const char* icon() override {
+        return "\xee\x81\x9f";
+    }
+    void init() override;
+    ObjectType type = SHADER_SOURCE_FILE;
 
     std::string filename;
     unsigned int shaderType = UNDEFINED;

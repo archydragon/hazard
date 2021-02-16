@@ -2,6 +2,28 @@
 
 ShaderProgram::ShaderProgram() = default;
 
+ShaderProgram::ShaderProgram(ObjectID id, const char* name) : ISceneObject(id, name) {
+    registerLinkName("vertexShaderFileID");
+    registerLinkName("fragmentShaderFileID");
+    registerLinkName("textureID");
+}
+
+void ShaderProgram::resolveLinks(const Objects& objs) {
+    ISceneObject::resolveLinks(objs);
+
+    if (links["vertexShaderFileID"] > 0) {
+        vertexShader             = (ShaderSourceFile*)objs.at(links["vertexShaderFileID"]).get();
+        vertexShader->shaderType = GL_VERTEX_SHADER;
+    }
+    if (links["fragmentShaderFileID"] > 0) {
+        fragmentShader = (ShaderSourceFile*)objs.at(links["fragmentShaderFileID"]).get();
+        fragmentShader->shaderType = GL_FRAGMENT_SHADER;
+    }
+    if (links["textureID"] > 0) {
+        textureDiffuse = (Texture*)objs.at(links["textureID"]).get();
+    }
+}
+
 void ShaderProgram::init() {
     // Don't try to init if shaders are not resolved and compiled.
     if (vertexShader == nullptr || fragmentShader == nullptr) {
@@ -25,30 +47,6 @@ void ShaderProgram::init() {
                   << log << std::endl;
     } else {
         std::cout << "Shader linked successfully." << std::endl;
-    }
-}
-
-void ShaderProgram::resolveLinks(const ShaderSourceFile::Objects& objects) {
-    for (auto& o : objects) {
-        if (o->id == links["vertexShaderFileID"]) {
-            vertexShader             = o.get();
-            vertexShader->shaderType = GL_VERTEX_SHADER;
-            vertexShader->init();
-        } else if (o->id == links["fragmentShaderFileID"]) {
-            fragmentShader             = o.get();
-            fragmentShader->shaderType = GL_FRAGMENT_SHADER;
-            fragmentShader->init();
-        }
-    }
-}
-
-void ShaderProgram::resolveLinks(const Texture::Objects& objects) {
-    for (auto& o : objects) {
-        if (o->id == links["textureID"]) {
-            textureDiffuse = o.get();
-            textureDiffuse->init();
-            break;
-        }
     }
 }
 

@@ -4,28 +4,25 @@
 #include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
+#include "ISceneObject.h"
 #include "ShaderSourceFile.h"
-#include "TSceneObject.h"
 #include "Texture.h"
 
-class ShaderProgram : public TSceneObject<ShaderProgram> {
+class ShaderProgram : public ISceneObject {
 public:
     ShaderProgram();
-    ShaderProgram(ObjectID pId, const char* pName) : TSceneObject(pId, pName) {
-        links.insert(std::pair<std::string, ObjectID>("vertexShaderFileID", 0));
-        links.insert(std::pair<std::string, ObjectID>("fragmentShaderFileID", 0));
-        links.insert(std::pair<std::string, ObjectID>("textureID", 0));
-    };
+    ShaderProgram(ObjectID id, const char* name);
 
-    void init();
-    void resolveLinks(const ShaderSourceFile::Objects& objects);
-    void resolveLinks(const Texture::Objects& objects);
+    const char* icon() override {
+        return "\xee\x82\xbc";
+    }
+    void resolveLinks(const Objects& objs) override;
+    void init() override;
     void use() const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
     void setInt(const std::string& name, int value) const;
 
-    ObjectType type  = SHADER_PROGRAM;
-    const char* icon = "\xee\x82\xbc";
+    ObjectType type = SHADER_PROGRAM;
 
     unsigned int programID = 0;
 

@@ -9,7 +9,7 @@
 #include "../engine/Camera.h"
 #include "../engine/Scene.h"
 #include "../engine/scene_objects/Drawable.h"
-#include "../engine/scene_objects/TSceneObject.h"
+#include "../engine/scene_objects/ISceneObject.h"
 
 class UI {
 public:

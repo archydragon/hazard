@@ -8,15 +8,15 @@
 #include "fields.h"
 
 // Functions based on this template return true if values have been changed.
-template <class C> bool properties(C* obj, Scene* scene);
+template <class C> bool propertiesFields(C* obj, Scene* scene);
 
-template <> bool properties<ShaderSourceFile>(ShaderSourceFile* obj, Scene* scene) {
+template <> bool propertiesFields<ShaderSourceFile>(ShaderSourceFile* obj, Scene* scene) {
     // Shader source file selector.
     return fileSelector("OpenShader", "Open shader file", ".vert .frag .geom", &obj->id,
                         &obj->filename);
 }
 
-template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
+template <> bool propertiesFields<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     // Shader selection.
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderSourceFile>();
     // Vertex shader selector.
@@ -33,7 +33,7 @@ template <> bool properties<ShaderProgram>(ShaderProgram* obj, Scene* scene) {
     return (vs || fs || ts);
 }
 
-template <> bool properties<Drawable>(Drawable* obj, Scene* scene) {
+template <> bool propertiesFields<Drawable>(Drawable* obj, Scene* scene) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
 
     bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
@@ -46,10 +46,16 @@ template <> bool properties<Drawable>(Drawable* obj, Scene* scene) {
     return (scaled || sp || moved || rotated);
 }
 
-template <> bool properties<Texture>(Texture* obj, Scene* scene) {
+template <> bool propertiesFields<Texture>(Texture* obj, Scene* scene) {
     // Shader source file selector.
     return fileSelector("OpenTexture", "Open texture image", ".png .jpeg .jpg .bmp .tga", &obj->id,
                         &obj->filename);
+}
+
+template <class C> void properties(ObjectID id, Scene* scene) {
+    if (propertiesFields<C>(scene->getObjectByID<C>(id), scene)) {
+        scene->refreshObject<C>(id);
+    }
 }
 
 // Selection entrypoint.
@@ -58,24 +64,16 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     case UNDEFINED:
         break;
     case SHADER_PROGRAM:
-        if (properties<ShaderProgram>(scene->getObjectByID<ShaderProgram>(id), scene)) {
-            scene->refreshObject<ShaderProgram>(id);
-        }
+        properties<ShaderProgram>(id, scene);
         break;
     case SHADER_SOURCE_FILE:
-        if (properties<ShaderSourceFile>(scene->getObjectByID<ShaderSourceFile>(id), scene)) {
-            scene->refreshObject<ShaderSourceFile>(id);
-        }
+        properties<ShaderSourceFile>(id, scene);
         break;
     case DRAWABLE:
-        if (properties<Drawable>(scene->getObjectByID<Drawable>(id), scene)) {
-            scene->refreshObject<Drawable>(id);
-        }
+        properties<Drawable>(id, scene);
         break;
     case TEXTURE:
-        if (properties<Texture>(scene->getObjectByID<Texture>(id), scene)) {
-            scene->refreshObject<Texture>(id);
-        }
+        properties<Texture>(id, scene);
         break;
     }
 }

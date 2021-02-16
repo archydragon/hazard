@@ -4,9 +4,9 @@
 #include "Camera.h"
 #include "RenderStats.h"
 #include "scene_objects/Drawable.h"
+#include "scene_objects/ISceneObject.h"
 #include "scene_objects/ShaderProgram.h"
 #include "scene_objects/ShaderSourceFile.h"
-#include "scene_objects/TSceneObject.h"
 #include "scene_objects/Texture.h"
 
 class Scene {
@@ -16,32 +16,28 @@ public:
     void draw();
     void save();
     void loadFromFile(const char* pFilename);
-    std::map<ObjectID, ObjectType> objectMap;
     static std::map<ObjectType, std::string> listObjectTypes();
     std::string getObjectDisplayName(ObjectID id);
     ObjectID createObject(int t, const char* n);
 
-    template <class C> typename C::Objects objects();
-    template <> typename ShaderSourceFile::Objects objects<ShaderSourceFile>() {
-        return objectsShaderSourceFile;
-    }
-    template <> typename ShaderProgram::Objects objects<ShaderProgram>() {
-        return objectsShaderProgram;
-    }
-    template <> typename Drawable::Objects objects<Drawable>() {
-        return objectsDrawable;
-    }
-    template <> typename Texture::Objects objects<Texture>() {
-        return objectsTexture;
+    template <class C> typename std::vector<C*> objects() {
+        std::vector<C*> vec;
+        for (auto [id, o] : objectsStorage) {
+            auto obj = dynamic_cast<C*>(o.get());
+            if (obj) {
+                vec.push_back(obj);
+            }
+        }
+        return vec;
+    };
+
+    template <class C> void pushObjectFromJSON(json& j) {
+        auto o                = std::make_shared<C>(j.get<C>());
+        objectsStorage[o->id] = o;
     }
 
     template <class C> C* getObjectByID(ObjectID id) {
-        for (auto o : this->template objects<C>()) {
-            if (o->id == id) {
-                return o.get();
-            }
-        }
-        return nullptr;
+        return dynamic_cast<C*>(objectsStorage[id].get());
     }
 
     template <class C> std::map<ObjectID, std::string> getObjectsNames() {
@@ -56,6 +52,7 @@ public:
         getObjectByID<C>(id)->init();
     }
 
+    std::map<ObjectID, ObjectType> objectMap;
     RenderStats* stats{};
 
 private:
@@ -63,11 +60,7 @@ private:
     int screenWidth;
     int screenHeight;
     Camera* camera;
-
-    ShaderProgram::Objects objectsShaderProgram;
-    ShaderSourceFile::Objects objectsShaderSourceFile;
-    Drawable::Objects objectsDrawable;
-    Texture::Objects objectsTexture;
+    Objects objectsStorage;
 
     void load();
     void resolveAndInit();

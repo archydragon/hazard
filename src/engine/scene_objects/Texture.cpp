@@ -9,6 +9,8 @@
 Texture::Texture() = default;
 
 void Texture::init() {
+    ISceneObject::init();
+
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID); // all upcoming GL_TEXTURE_2D operations now have
                                              // effect on this texture object

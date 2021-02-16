@@ -3,6 +3,8 @@
 ShaderSourceFile::ShaderSourceFile() = default;
 
 void ShaderSourceFile::init() {
+    ISceneObject::init();
+
     std::string content;
     std::ifstream file;
 
@@ -22,7 +24,7 @@ void ShaderSourceFile::init() {
     const char* shaderCode = content.c_str();
 
     // Compile shader.
-    shader = glCreateShader(this->shaderType);
+    shader = glCreateShader(shaderType);
     glShaderSource(shader, 1, &shaderCode, NULL);
     glCompileShader(shader);
 

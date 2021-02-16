@@ -40,21 +40,21 @@ void Scene::draw() {
     }
 }
 
+void Scene::resolveAndInit() {
+    for (auto [id, o] : objectsStorage) {
+        if (!o->links.empty()) {
+            o->resolveLinks(objectsStorage);
+        }
+    }
+
+    for (auto [id, o] : objectsStorage) {
+        o->init();
+    }
+}
+
 void Scene::loadFromFile(const char* pFilename) {
     filename = pFilename;
     load();
-}
-
-void Scene::resolveAndInit() {
-    for (auto& shader : objects<ShaderProgram>()) {
-        shader->resolveLinks(objects<ShaderSourceFile>());
-        shader->resolveLinks(objects<Texture>());
-        shader->init();
-    }
-    for (auto& c : objects<Drawable>()) {
-        c->resolveLinks(objects<ShaderProgram>());
-        c->init();
-    }
 }
 
 // (De)serialization here is done in semi-manual way instead of macros because seems that
@@ -75,30 +75,24 @@ void Scene::load() {
             case UNDEFINED:
                 break;
             case SHADER_SOURCE_FILE: {
-                auto o = std::make_shared<ShaderSourceFile>(it.get<ShaderSourceFile>());
-                objectsShaderSourceFile.push_back(o);
+                pushObjectFromJSON<ShaderSourceFile>(it);
                 break;
             }
             case SHADER_PROGRAM: {
-                auto o = std::make_shared<ShaderProgram>(it.get<ShaderProgram>());
-                objectsShaderProgram.push_back(o);
+                pushObjectFromJSON<ShaderProgram>(it);
                 break;
             }
             case DRAWABLE: {
-                auto o = std::make_shared<Drawable>(it.get<Drawable>());
-                std::cout << o.get()->drawableType << std::endl;
-                objectsDrawable.push_back(o);
+                pushObjectFromJSON<Drawable>(it);
                 break;
             }
             case TEXTURE: {
-                auto o = std::make_shared<Texture>(it.get<Texture>());
-                objectsTexture.push_back(o);
+                pushObjectFromJSON<Texture>(it);
                 break;
             }
             }
             objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
-
         std::cout << "Scene loaded." << std::endl;
     } else {
         std::cerr << "Failed to open scene file, using an empty scene." << std::endl;
@@ -141,9 +135,10 @@ ObjectID Scene::createObject(int t, const char* name) {
     int newID = distribution(generator);
 
     if (t > DRAWABLE) {
-        auto o          = std::make_shared<Drawable>(newID, name);
-        o->drawableType = DrawableType(t);
-        objectsDrawable.push_back(o);
+        auto o                = std::make_shared<Drawable>(newID, name);
+        o->drawableType       = DrawableType(t);
+        objectsStorage[newID] = o;
+        // Set type back to DRAWABLE for switch-case below.
         t = DRAWABLE;
     }
 
@@ -152,19 +147,18 @@ ObjectID Scene::createObject(int t, const char* name) {
         std::cerr << "New object type is not defined." << std::endl;
         return 0;
     case SHADER_SOURCE_FILE: {
-        auto no = std::make_shared<ShaderSourceFile>(newID, name);
-        objectsShaderSourceFile.push_back(no);
+        objectsStorage[newID] = std::make_shared<ShaderSourceFile>(newID, name);
         break;
     }
     case SHADER_PROGRAM: {
-        objectsShaderProgram.push_back(std::make_shared<ShaderProgram>(newID, name));
+        objectsStorage[newID] = std::make_shared<ShaderProgram>(newID, name);
         break;
     }
     case DRAWABLE: {
         break;
     }
     case TEXTURE: {
-        objectsTexture.push_back(std::make_shared<Texture>(newID, name));
+        objectsStorage[newID] = (std::make_shared<Texture>(newID, name));
         break;
     }
     default:
@@ -180,26 +174,9 @@ ObjectID Scene::createObject(int t, const char* name) {
 
 // This method is being called only by UI so it prefixes object name with its icon, that's all.
 std::string Scene::getObjectDisplayName(ObjectID oid) {
-    for (auto& [id, type] : objectMap) {
-        if (id == oid) {
-            switch (ObjectType(type)) {
-            case SHADER_SOURCE_FILE: {
-                auto o = getObjectByID<ShaderSourceFile>(id);
-                return std::string(o->icon) + " " + o->name;
-            }
-            case SHADER_PROGRAM: {
-                auto o = getObjectByID<ShaderProgram>(id);
-                return std::string(o->icon) + " " + o->name;
-            }
-            case DRAWABLE: {
-                auto o = getObjectByID<Drawable>(id);
-                return std::string(o->icon) + " " + o->name;
-            }
-            case TEXTURE: {
-                auto o = getObjectByID<Texture>(id);
-                return std::string(o->icon) + " " + o->name;
-            }
-            }
+    for (auto [id, o] : objectsStorage) {
+        if (o && id == oid) {
+            return std::string(o->icon()) + " " + o->name;
         }
     }
     return "";

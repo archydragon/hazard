@@ -1,7 +1,7 @@
 #include "Drawable.h"
 
-Drawable::Drawable(ObjectID id, const char* name) : TSceneObject(id, name) {
-    links.insert(std::pair<std::string, ObjectID>("shaderProgramID", 0));
+Drawable::Drawable(ObjectID id, const char* name) : ISceneObject(id, name) {
+    registerLinkName("shaderProgramID");
 }
 
 std::map<DrawableType, std::string> Drawable::listObjectTypes() {
@@ -11,16 +11,17 @@ std::map<DrawableType, std::string> Drawable::listObjectTypes() {
     return types;
 }
 
-void Drawable::resolveLinks(const ShaderProgram::Objects& objects) {
-    for (const auto& o : objects) {
-        if (o->id == links["shaderProgramID"]) {
-            shader = o.get();
-            break;
-        }
+void Drawable::resolveLinks(const Objects& objs) {
+    ISceneObject::resolveLinks(objs);
+
+    if (links["shaderProgramID"] > 0) {
+        shader = (ShaderProgram*)objs.at(links["shaderProgramID"]).get();
     }
 }
 
 void Drawable::init() {
+    ISceneObject::init();
+
     switch (drawableType) {
     case CUBE:
         drawable = std::make_unique<Cube>();
@@ -29,7 +30,6 @@ void Drawable::init() {
         drawable = std::make_unique<Plane>();
         break;
     }
-    icon = drawable->icon();
     drawable->init();
 }
 

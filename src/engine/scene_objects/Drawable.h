@@ -6,25 +6,32 @@
 #include <glm2json.h>
 #include <nlohmann/json.hpp>
 
+#include "ISceneObject.h"
 #include "ShaderProgram.h"
-#include "TSceneObject.h"
 #include "drawables/Cube.h"
 #include "drawables/IDrawable.h"
 #include "drawables/Plane.h"
 
-class Drawable : public TSceneObject<Drawable> {
+class Drawable : public ISceneObject {
 public:
     Drawable() = default;
     Drawable(ObjectID id, const char* name);
-    static std::map<DrawableType, std::string> listObjectTypes();
-    void resolveLinks(const ShaderProgram::Objects& objects);
+    void resolveLinks(const Objects& objs) override;
     void init();
     unsigned int draw(glm::mat4 projection, glm::mat4 view);
 
-    ObjectType type  = DRAWABLE;
-    const char* icon = "";
+    static std::map<DrawableType, std::string> listObjectTypes();
+
+    ObjectType type = DRAWABLE;
     std::unique_ptr<IDrawable> drawable;
     DrawableType drawableType = UNKNOWN;
+
+    const char* icon() override {
+        if (!drawable) {
+            return "";
+        }
+        return drawable->icon();
+    };
 
     float scale        = 1.0f;
     glm::vec3 position = glm::vec3(0.0f);

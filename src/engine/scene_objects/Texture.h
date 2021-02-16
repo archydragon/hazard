@@ -3,16 +3,18 @@
 
 #include <nlohmann/json.hpp>
 
-#include "TSceneObject.h"
+#include "ISceneObject.h"
 
-class Texture : public TSceneObject<Texture> {
+class Texture : public ISceneObject {
 public:
     Texture();
-    Texture(ObjectID pId, const char* pName) : TSceneObject(pId, pName){};
+    Texture(ObjectID pId, const char* pName) : ISceneObject(pId, pName){};
 
-    void init();
-    ObjectType type  = TEXTURE;
-    const char* icon = "\xee\x81\xb5";
+    const char* icon() override {
+        return "\xee\x81\xb5";
+    }
+    void init() override;
+    ObjectType type = TEXTURE;
 
     std::string filename;
     unsigned int textureID = 0;
