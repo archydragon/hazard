@@ -54,7 +54,7 @@ template <> bool propertiesFields<Texture>(Texture* obj, Scene* scene) {
 
 template <class C> void properties(ObjectID id, Scene* scene) {
     if (propertiesFields<C>(scene->getObjectByID<C>(id), scene)) {
-        scene->refreshObject<C>(id);
+        scene->refreshObject(id);
     }
 }
 

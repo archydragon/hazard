@@ -50,6 +50,21 @@ void Scene::resolveAndInit() {
     for (auto [id, o] : objectsStorage) {
         o->init();
     }
+
+    rebuildAncestors();
+}
+
+void Scene::rebuildAncestors() {
+    ancestors.clear();
+    for (auto [id, o] : objectsStorage) {
+        if (o->links.empty()) {
+            continue;
+        }
+
+        for (auto lo : o->pLinks) {
+            ancestors[lo->id].push_back(o.get());
+        }
+    }
 }
 
 void Scene::loadFromFile(const char* pFilename) {
@@ -180,4 +195,23 @@ std::string Scene::getObjectDisplayName(ObjectID oid) {
         }
     }
     return "";
+}
+
+// Two-way object refresher.
+void Scene::refreshObject(ObjectID id, bool needRebuild) {
+    // First, re-resolve links to children.
+    auto obj = objectsStorage[id].get();
+    obj->resolveLinks(objectsStorage);
+
+    // If it was the first call from this function from UI update, we also need to rebuild ancestors
+    // cache.
+    if (needRebuild) {
+        rebuildAncestors();
+    }
+
+    // Re-initialize object and its ancestors.
+    obj->init();
+    for (auto a : ancestors[id]) {
+        a->init();
+    }
 }

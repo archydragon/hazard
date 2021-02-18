@@ -40,7 +40,6 @@ public:
         }
     };
     virtual void resolveLinks(const std::map<ObjectID, std::shared_ptr<ISceneObject>>& objs) {
-        std::cout << id << std::endl;
         for (auto& [_, id] : links) {
             if (id > 0) {
                 pLinks.push_back(objs.at(id).get());
@@ -56,10 +55,10 @@ public:
     ObjectType const type = UNDEFINED;
     std::string name;
     std::map<std::string, ObjectID> links;
+    std::vector<ISceneObject*> pLinks;
 
 private:
     bool initialized = false;
-    std::vector<ISceneObject*> pLinks;
 };
 
 typedef std::map<ObjectID, std::shared_ptr<ISceneObject>> Objects;

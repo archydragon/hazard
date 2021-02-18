@@ -19,6 +19,7 @@ public:
     static std::map<ObjectType, std::string> listObjectTypes();
     std::string getObjectDisplayName(ObjectID id);
     ObjectID createObject(int t, const char* n);
+    void refreshObject(ObjectID id, bool needRebuild = true);
 
     template <class C> typename std::vector<C*> objects() {
         std::vector<C*> vec;
@@ -48,10 +49,6 @@ public:
         return result;
     }
 
-    template <class C> void refreshObject(ObjectID id) {
-        getObjectByID<C>(id)->init();
-    }
-
     std::map<ObjectID, ObjectType> objectMap;
     RenderStats* stats{};
 
@@ -61,9 +58,11 @@ private:
     int screenHeight;
     Camera* camera;
     Objects objectsStorage;
+    std::map<ObjectID, std::vector<ISceneObject*>> ancestors;
 
     void load();
     void resolveAndInit();
+    void rebuildAncestors();
 };
 
 #endif // HAZARD_SCENE_H
