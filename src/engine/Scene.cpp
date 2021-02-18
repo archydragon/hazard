@@ -79,6 +79,7 @@ void Scene::loadFromFile(const char* pFilename) {
 void Scene::load() {
     std::ifstream ifs(filename);
     if (ifs.good()) {
+        sortedObjectIDs.clear();
         std::cout << "Using " << filename << " to load scene." << std::endl;
         json j;
         ifs >> j;
@@ -106,6 +107,7 @@ void Scene::load() {
                 break;
             }
             }
+            sortedObjectIDs.push_back(it["id"]);
         }
         std::cout << "Scene loaded." << std::endl;
     } else {
@@ -113,6 +115,7 @@ void Scene::load() {
     }
 
     resolveAndInit();
+    sortIDs();
 }
 
 void Scene::save() {
@@ -179,6 +182,8 @@ ObjectID Scene::createObject(int t, const char* name) {
         std::cerr << "Unsupported object type: " << t << std::endl;
         return 0;
     }
+    sortedObjectIDs.push_back(newID);
+    sortIDs();
 
     std::cout << "Object (ID = " << newID << ") created." << std::endl;
     return newID;
@@ -211,4 +216,12 @@ void Scene::refreshObject(ObjectID id, bool needRebuild) {
     for (auto a : ancestors[id]) {
         a->init();
     }
+}
+
+// This helper function is called each time when we load scene or create a new object. Otherwise, it
+// would need to sort objects each frame as it is being called by Imgui.
+void Scene::sortIDs() {
+    std::sort(sortedObjectIDs.begin(), sortedObjectIDs.end(), [this](ObjectID a, ObjectID b) {
+        return objectsStorage[a]->name < objectsStorage[b]->name;
+    });
 }

@@ -173,7 +173,7 @@ void UI::windowObjects() {
         }
 
         // Objects list
-        for (auto& [id, o] : scene->objectsStorage) {
+        for (auto& id : scene->sortedObjectIDs) {
             auto displayName = scene->getObjectDisplayName(id);
 
             if (ImGui::Selectable(displayName.c_str(), false,

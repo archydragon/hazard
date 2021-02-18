@@ -54,6 +54,7 @@ public:
     }
 
     Objects objectsStorage;
+    std::vector<ObjectID> sortedObjectIDs;
     RenderStats* stats{};
 
 private:
@@ -66,6 +67,7 @@ private:
     void load();
     void resolveAndInit();
     void rebuildAncestors();
+    void sortIDs();
 };
 
 #endif // HAZARD_SCENE_H
