@@ -123,20 +123,18 @@ void Scene::save() {
     j["camera"]  = *camera;
     j["objects"] = json::array();
     for (auto& [id, o] : objectsStorage) {
-        json jo;
-        switch (o->type) {
-        case SHADER_SOURCE_FILE:
-            j["objects"].push_back(*getObjectByID<ShaderSourceFile>(id));
-            break;
-        case SHADER_PROGRAM:
-            j["objects"].push_back(*getObjectByID<ShaderProgram>(id));
-            break;
-        case DRAWABLE:
-            j["objects"].push_back(*getObjectByID<Drawable>(id));
-            break;
-        case TEXTURE:
-            j["objects"].push_back(*getObjectByID<Texture>(id));
-            break;
+        // FIXME: it looks like a dirty hack, prettify.
+        if (dynamic_cast<ShaderProgram*>(o.get())) {
+            j["objects"].push_back(*dynamic_cast<ShaderProgram*>(o.get()));
+        }
+        if (dynamic_cast<ShaderSourceFile*>(o.get())) {
+            j["objects"].push_back(*dynamic_cast<ShaderSourceFile*>(o.get()));
+        }
+        if (dynamic_cast<Drawable*>(o.get())) {
+            j["objects"].push_back(*dynamic_cast<Drawable*>(o.get()));
+        }
+        if (dynamic_cast<Texture*>(o.get())) {
+            j["objects"].push_back(*dynamic_cast<Texture*>(o.get()));
         }
     }
 
@@ -205,8 +203,8 @@ void Scene::refreshObject(ObjectID id, bool needRebuild) {
     auto obj = objectsStorage[id].get();
     obj->resolveLinks(objectsStorage);
 
-    // If it was the first call from this function from UI update, we also need to rebuild ancestors
-    // cache.
+    // If it was the first call from this function from UI update, we also need to rebuild
+    // ancestors cache.
     if (needRebuild) {
         rebuildAncestors();
     }
@@ -218,8 +216,8 @@ void Scene::refreshObject(ObjectID id, bool needRebuild) {
     }
 }
 
-// This helper function is called each time when we load scene or create a new object. Otherwise, it
-// would need to sort objects each frame as it is being called by Imgui.
+// This helper function is called each time when we load scene or create a new object.
+// Otherwise, it would need to sort objects each frame as it is being called by Imgui.
 void Scene::sortIDs() {
     std::sort(sortedObjectIDs.begin(), sortedObjectIDs.end(), [this](ObjectID a, ObjectID b) {
         return objectsStorage[a]->name < objectsStorage[b]->name;
