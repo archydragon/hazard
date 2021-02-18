@@ -106,7 +106,6 @@ void Scene::load() {
                 break;
             }
             }
-            objectMap.insert(std::pair<unsigned int, ObjectType>(it["id"], t));
         }
         std::cout << "Scene loaded." << std::endl;
     } else {
@@ -120,9 +119,9 @@ void Scene::save() {
     json j;
     j["camera"]  = *camera;
     j["objects"] = json::array();
-    for (auto& [id, type] : objectMap) {
+    for (auto& [id, o] : objectsStorage) {
         json jo;
-        switch (ObjectType(type)) {
+        switch (o->type) {
         case SHADER_SOURCE_FILE:
             j["objects"].push_back(*getObjectByID<ShaderSourceFile>(id));
             break;
@@ -180,8 +179,6 @@ ObjectID Scene::createObject(int t, const char* name) {
         std::cerr << "Unsupported object type: " << t << std::endl;
         return 0;
     }
-
-    objectMap.insert(std::pair<ObjectID, ObjectType>(newID, ObjectType(t)));
 
     std::cout << "Object (ID = " << newID << ") created." << std::endl;
     return newID;

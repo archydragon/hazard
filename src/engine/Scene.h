@@ -49,7 +49,7 @@ public:
         return result;
     }
 
-    std::map<ObjectID, ObjectType> objectMap;
+    Objects objectsStorage;
     RenderStats* stats{};
 
 private:
@@ -57,7 +57,6 @@ private:
     int screenWidth;
     int screenHeight;
     Camera* camera;
-    Objects objectsStorage;
     std::map<ObjectID, std::vector<ISceneObject*>> ancestors;
 
     void load();

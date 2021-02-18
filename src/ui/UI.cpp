@@ -39,7 +39,7 @@ UI::UI(GLFWwindow* window, Config* config, Scene* scene, Camera* camera)
     ImGui_ImplOpenGL3_Init(NULL);
 
     updateWindowTitle();
-    for (auto& [id, _] : scene->objectMap) {
+    for (auto& [id, _] : scene->objectsStorage) {
         this->showWindowProperties[id] = false;
     }
 }
@@ -173,7 +173,7 @@ void UI::windowObjects() {
         }
 
         // Objects list
-        for (auto& [id, type] : scene->objectMap) {
+        for (auto& [id, o] : scene->objectsStorage) {
             auto displayName = scene->getObjectDisplayName(id);
 
             if (ImGui::Selectable(displayName.c_str(), false,
@@ -189,7 +189,7 @@ void UI::windowObjects() {
 }
 
 void UI::windowsProperties() {
-    for (auto& [id, type] : scene->objectMap) {
+    for (auto& [id, o] : scene->objectsStorage) {
         if (!showWindowProperties[id]) {
             continue;
         }
@@ -198,7 +198,7 @@ void UI::windowsProperties() {
         char windowTitle[256] = "properties";
         sprintf(windowTitle, "%s - properties", scene->getObjectDisplayName(id).c_str());
         if (ImGui::Begin(windowTitle, &showWindowProperties[id], ImGuiWindowFlags_NoCollapse)) {
-            properties(id, type, scene);
+            properties(id, o->type, scene);
             ImGui::End();
         }
     }
