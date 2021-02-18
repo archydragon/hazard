@@ -60,21 +60,19 @@ template <class C> void properties(ObjectID id, Scene* scene) {
 
 // Selection entrypoint.
 void properties(ObjectID id, ObjectType type, Scene* scene) {
-    switch (type) {
-    case UNDEFINED:
-        break;
-    case SHADER_PROGRAM:
+    // FIXME: it looks like a dirty hack, prettify.
+    auto obj = scene->getBaseObjectByID(id);
+    if (dynamic_cast<ShaderProgram*>(obj)) {
         properties<ShaderProgram>(id, scene);
-        break;
-    case SHADER_SOURCE_FILE:
+    }
+    if (dynamic_cast<ShaderSourceFile*>(obj)) {
         properties<ShaderSourceFile>(id, scene);
-        break;
-    case DRAWABLE:
+    }
+    if (dynamic_cast<Drawable*>(obj)) {
         properties<Drawable>(id, scene);
-        break;
-    case TEXTURE:
+    }
+    if (dynamic_cast<Texture*>(obj)) {
         properties<Texture>(id, scene);
-        break;
     }
 }
 

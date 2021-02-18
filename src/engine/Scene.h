@@ -37,6 +37,10 @@ public:
         objectsStorage[o->id] = o;
     }
 
+    ISceneObject* getBaseObjectByID(ObjectID id) {
+        return objectsStorage[id].get();
+    }
+
     template <class C> C* getObjectByID(ObjectID id) {
         return dynamic_cast<C*>(objectsStorage[id].get());
     }
