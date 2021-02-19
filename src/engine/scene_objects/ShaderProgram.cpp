@@ -14,13 +14,19 @@ void ShaderProgram::resolveLinks(const Objects& objs) {
     if (links["vertexShaderFileID"] > 0) {
         vertexShader             = (ShaderSourceFile*)objs.at(links["vertexShaderFileID"]).get();
         vertexShader->shaderType = GL_VERTEX_SHADER;
+    } else {
+        vertexShader = nullptr;
     }
     if (links["fragmentShaderFileID"] > 0) {
         fragmentShader = (ShaderSourceFile*)objs.at(links["fragmentShaderFileID"]).get();
         fragmentShader->shaderType = GL_FRAGMENT_SHADER;
+    } else {
+        fragmentShader = nullptr;
     }
     if (links["textureID"] > 0) {
         textureDiffuse = (Texture*)objs.at(links["textureID"]).get();
+    } else {
+        textureDiffuse = nullptr;
     }
 }
 

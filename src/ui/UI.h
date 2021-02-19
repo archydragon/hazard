@@ -39,6 +39,7 @@ private:
     void dialogOpenScene();
     void popupNewObject();
     void popupRenameObject();
+    void popupDeleteObject();
 
     // Windows and dialogs display states.
     bool showWindowCamera  = true;
@@ -48,6 +49,7 @@ private:
     bool showDialogOpenScene   = false;
     bool showPopupNewObject    = false;
     bool showPopupRenameObject = false;
+    bool showPopupDeleteObject = false;
 
     int newObjectType = 0;
     std::string newObjectTypeName;

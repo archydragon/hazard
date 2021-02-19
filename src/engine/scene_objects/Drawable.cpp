@@ -16,6 +16,8 @@ void Drawable::resolveLinks(const Objects& objs) {
 
     if (links["shaderProgramID"] > 0) {
         shader = (ShaderProgram*)objs.at(links["shaderProgramID"]).get();
+    } else {
+        shader = nullptr;
     }
 }
 

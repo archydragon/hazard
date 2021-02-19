@@ -51,6 +51,7 @@ void Scene::resolveAndInit() {
         o->init();
     }
 
+    sortIDs();
     rebuildAncestors();
 }
 
@@ -192,6 +193,24 @@ void Scene::renameObject(ObjectID id, const std::string& newName) {
     sortIDs();
 }
 
+void Scene::deleteObject(ObjectID id) {
+    sortedObjectIDs.erase(std::remove(sortedObjectIDs.begin(), sortedObjectIDs.end(), id),
+                          sortedObjectIDs.end());
+    objectsStorage.erase(id);
+    ancestors.erase(id);
+    std::cout << "Object (ID = " << id << ") deleted." << std::endl;
+
+    // Remove this ID mentions in all links and re-resolve the whole scene.
+    for (auto [_, obj] : objectsStorage) {
+        for (auto [linkedKey, linkedID] : obj->links) {
+            if (id == linkedID) {
+                obj->links[linkedKey] = 0;
+            }
+        }
+    }
+    resolveAndInit();
+}
+
 // This method is being called only by UI so it prefixes object name with its icon, that's all.
 std::string Scene::getObjectDisplayName(ObjectID oid) {
     for (auto [id, o] : objectsStorage) {
@@ -227,4 +246,12 @@ void Scene::sortIDs() {
     std::sort(sortedObjectIDs.begin(), sortedObjectIDs.end(), [this](ObjectID a, ObjectID b) {
         return objectsStorage[a]->name < objectsStorage[b]->name;
     });
+}
+
+std::vector<ISceneObject*> Scene::getAncestors(ObjectID id) {
+    std::vector<ISceneObject*> objectAncestors;
+    for (auto obj : ancestors[id]) {
+        objectAncestors.push_back(obj);
+    }
+    return objectAncestors;
 }

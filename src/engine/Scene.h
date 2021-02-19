@@ -20,7 +20,9 @@ public:
     std::string getObjectDisplayName(ObjectID id);
     ObjectID createObject(int t, const char* n);
     void renameObject(ObjectID id, const std::string& newName);
+    void deleteObject(ObjectID id);
     void refreshObject(ObjectID id, bool needRebuild = true);
+    std::vector<ISceneObject*> getAncestors(ObjectID id);
 
     template <class C> typename std::vector<C*> objects() {
         std::vector<C*> vec;

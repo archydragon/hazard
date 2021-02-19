@@ -71,6 +71,8 @@ void UI::initFrame() {
         popupNewObject();
         // Modal popup for renaming an object.
         popupRenameObject();
+        // Modal popup for deleting object.
+        popupDeleteObject();
     }
 }
 
@@ -194,6 +196,10 @@ void UI::windowObjects() {
                 if (ImGui::Selectable("Rename", false)) {
                     currentObjectID       = id;
                     showPopupRenameObject = true;
+                }
+                if (ImGui::Selectable("Delete", false)) {
+                    currentObjectID       = id;
+                    showPopupDeleteObject = true;
                 }
                 ImGui::EndPopup();
             }
@@ -346,12 +352,44 @@ void UI::popupRenameObject() {
         ImGui::SameLine();
         ImGui::InputText("##name", newName, 256);
         if (ImGui::Button("Rename")) {
-            std::cout << newName << std::endl;
             scene->renameObject(currentObjectID, std::string(newName));
             ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel")) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void UI::popupDeleteObject() {
+    if (showPopupDeleteObject) {
+        ImGui::OpenPopup("Delete object");
+        showPopupDeleteObject = false;
+    }
+
+    if (ImGui::BeginPopupModal("Delete object", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Are you sure about deletion of '%s'?",
+                    scene->getObjectDisplayName(currentObjectID).c_str());
+        std::vector<ISceneObject*> ancesors = scene->getAncestors(currentObjectID);
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        if (!ancesors.empty()) {
+            ImGui::Text(
+                "These objects have links to this one, after deletion they may work incorrectly:");
+            for (auto anc : ancesors) {
+                ImGui::BulletText("%s %s", anc->icon(), anc->name.c_str());
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        }
+        // Center Yes/No buttons.
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2 - 102);
+        if (ImGui::Button("Yes", ImVec2(100.0f, 25.0f))) {
+            scene->deleteObject(currentObjectID);
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No", ImVec2(100.0f, 25.0f))) {
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
