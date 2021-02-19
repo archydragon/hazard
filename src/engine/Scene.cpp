@@ -187,6 +187,11 @@ ObjectID Scene::createObject(int t, const char* name) {
     return newID;
 }
 
+void Scene::renameObject(ObjectID id, const std::string& newName) {
+    objectsStorage[id]->name = newName;
+    sortIDs();
+}
+
 // This method is being called only by UI so it prefixes object name with its icon, that's all.
 std::string Scene::getObjectDisplayName(ObjectID oid) {
     for (auto [id, o] : objectsStorage) {

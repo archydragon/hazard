@@ -38,17 +38,20 @@ private:
     void windowsProperties();
     void dialogOpenScene();
     void popupNewObject();
+    void popupRenameObject();
 
     // Windows and dialogs display states.
     bool showWindowCamera  = true;
     bool showWindowObjects = true;
     bool showWindowStats   = true;
     std::map<ObjectID, bool> showWindowProperties;
-    bool showDialogOpenScene = false;
-    bool showPopupNewObject  = false;
+    bool showDialogOpenScene   = false;
+    bool showPopupNewObject    = false;
+    bool showPopupRenameObject = false;
 
     int newObjectType = 0;
     std::string newObjectTypeName;
+    ObjectID currentObjectID;
 
     void updateWindowTitle();
     static bool newImGuiWindow(const char* name, bool* p_open, float posX, float posY, float sizeX,

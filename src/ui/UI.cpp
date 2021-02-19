@@ -69,6 +69,8 @@ void UI::initFrame() {
 
         // Modal popup for creating a new object.
         popupNewObject();
+        // Modal popup for renaming an object.
+        popupRenameObject();
     }
 }
 
@@ -178,9 +180,22 @@ void UI::windowObjects() {
 
             if (ImGui::Selectable(displayName.c_str(), false,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
+
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     showWindowProperties[id] = true;
                 }
+            }
+            if (ImGui::BeginPopupContextItem()) {
+                ImGui::Text("%s", displayName.c_str());
+                ImGui::Separator();
+                if (ImGui::Selectable("Properties", false)) {
+                    showWindowProperties[id] = true;
+                }
+                if (ImGui::Selectable("Rename", false)) {
+                    currentObjectID       = id;
+                    showPopupRenameObject = true;
+                }
+                ImGui::EndPopup();
             }
         }
 
@@ -305,6 +320,38 @@ void UI::popupNewObject() {
         ImGui::SameLine();
         if (ImGui::Button("Cancel")) {
             name[0] = '\0';
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void UI::popupRenameObject() {
+    static char newName[256];
+
+    if (showPopupRenameObject) {
+        ImGui::OpenPopup("Rename object");
+        showPopupRenameObject = false;
+
+        // This block is here to avoid copying and reinstantiation of newName on each frame, it
+        // should happen only when the popup appears.
+        const std::string& name = scene->getBaseObjectByID(currentObjectID)->name;
+        name.copy(newName, name.size(), 0);
+        newName[name.size()] = '\0';
+    }
+    if (ImGui::BeginPopupModal("Rename object", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        // TODO: display object type when renaming.
+        //        ImGui::Text("Object type: %s", newObjectTypeName.c_str());
+        ImGui::Text("Object name:");
+        ImGui::SameLine();
+        ImGui::InputText("##name", newName, 256);
+        if (ImGui::Button("Rename")) {
+            std::cout << newName << std::endl;
+            scene->renameObject(currentObjectID, std::string(newName));
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();

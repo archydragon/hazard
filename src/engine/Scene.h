@@ -19,6 +19,7 @@ public:
     static std::map<ObjectType, std::string> listObjectTypes();
     std::string getObjectDisplayName(ObjectID id);
     ObjectID createObject(int t, const char* n);
+    void renameObject(ObjectID id, const std::string& newName);
     void refreshObject(ObjectID id, bool needRebuild = true);
 
     template <class C> typename std::vector<C*> objects() {
