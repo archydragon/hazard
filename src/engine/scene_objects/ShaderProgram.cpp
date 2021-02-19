@@ -31,6 +31,8 @@ void ShaderProgram::resolveLinks(const Objects& objs) {
 }
 
 void ShaderProgram::init() {
+    ISceneObject::init();
+
     // Don't try to init if shaders are not resolved and compiled.
     if (vertexShader == nullptr || fragmentShader == nullptr) {
         return;
@@ -53,6 +55,7 @@ void ShaderProgram::init() {
                   << log << std::endl;
     } else {
         std::cout << "Shader linked successfully." << std::endl;
+        retrieveUniforms();
     }
 }
 
@@ -67,6 +70,27 @@ void ShaderProgram::use() const {
         glActiveTexture(GL_TEXTURE0 + textureDiffuse->textureID);
         setInt("texture_diffuse", textureDiffuse->textureID);
         glBindTexture(GL_TEXTURE_2D, textureDiffuse->textureID);
+    }
+}
+
+void ShaderProgram::retrieveUniforms() {
+    uniforms.clear();
+    int numUniforms;
+    glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &numUniforms);
+    for (int ui = 0; ui < numUniforms; ui++) {
+        char name[256];
+        unsigned int uType;
+        int nLength;
+        int uSize;
+        glGetActiveUniform(programID, ui, 256, &nLength, &uSize, &uType, name);
+
+        std::string sName = std::string(name);
+        // Those uniforms are not supposed to be universallu configurable.
+        if (sName == "model" || sName == "view" || sName == "projection") {
+            continue;
+        }
+
+        uniforms[sName] = ShaderUniform{sName, uType};
     }
 }
 

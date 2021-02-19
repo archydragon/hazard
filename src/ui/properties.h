@@ -26,11 +26,27 @@ template <> bool propertiesFields<ShaderProgram>(ShaderProgram* obj, Scene* scen
     bool fs = linkedObjectSelector("Fragment shader", &obj->id, &obj->links["fragmentShaderFileID"],
                                    links);
 
-    // Texture selection.
-    links   = scene->getObjectsNames<Texture>();
-    bool ts = linkedObjectSelector("Texture", &obj->id, &obj->links["textureID"], links);
+    // Uniforms.
+    std::vector<bool> uniformChanges;
+    if (!obj->uniforms.empty()) {
+        ImGui::Dummy(ImVec2(0, 10));
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0, 10));
+        ImGui::Text("Uniform values:");
 
-    return (vs || fs || ts);
+        for (auto [uName, uniform] : obj->uniforms) {
+            switch (uniform.type) {
+            case GL_SAMPLER_2D:
+                links = scene->getObjectsNames<Texture>();
+                bool us =
+                    linkedObjectSelector(uName.c_str(), &obj->id, &obj->links["textureID"], links);
+                uniformChanges.push_back(us);
+            }
+        }
+    }
+
+    bool uc = std::any_of(uniformChanges.begin(), uniformChanges.end(), [](bool c) { return c; });
+    return (vs || fs || uc);
 }
 
 template <> bool propertiesFields<Drawable>(Drawable* obj, Scene* scene) {
