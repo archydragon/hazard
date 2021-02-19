@@ -75,12 +75,12 @@ bool linkedObjectSelector(const char* label, const ObjectID* oid, ObjectID* targ
 
 // Slider to define float values.
 bool floatSlider(const char* label, float min, float max, const ObjectID* oid, float* value) {
-    return ImGui::DragFloat(label, value, 0.1f, min, max, "%.1f");
+    return ImGui::DragFloat(label, value, 0.01f, min, max, "%.2f");
 }
 
 // Slider to define 3-vector float values
 bool vec3Slider(const char* label, float min, float max, const ObjectID* oid, glm::vec3* value) {
-    return ImGui::DragFloat3(label, (float*)value, 0.1f, min, max, "%.1f");
+    return ImGui::DragFloat3(label, (float*)value, 0.01f, min, max, "%.2f");
 }
 
 #endif // HAZARD_FIELDS_H
