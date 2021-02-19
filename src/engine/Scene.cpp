@@ -35,6 +35,14 @@ void Scene::draw() {
         perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     mat4 view = camera->getViewMatrix();
 
+    for (auto& [id, obj] : objectsStorage) {
+        if (obj->refreshRequired) {
+            std::cout << "Object " << id << " requres an update." << std::endl;
+            refreshObject(id);
+            obj->refreshRequired = false;
+        }
+    }
+
     for (auto& o : objects<Drawable>()) {
         stats->drawCalls += o->draw(projection, view);
     }

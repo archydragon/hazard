@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "ShaderSourceFile.h"
 
 ShaderSourceFile::ShaderSourceFile() = default;
@@ -40,5 +42,20 @@ void ShaderSourceFile::init() {
                   << log << std::endl;
     } else {
         std::cout << "Shader " << filename << " loaded and compiled." << std::endl;
+        lastFileUpdate = std::filesystem::last_write_time(filename.c_str());
+        std::thread watcher(&ShaderSourceFile::watchFileChanges, this);
+        watcher.detach();
+    }
+}
+
+[[noreturn]] void ShaderSourceFile::watchFileChanges() {
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        auto update = std::filesystem::last_write_time(filename.c_str());
+        if (update > lastFileUpdate) {
+            lastFileUpdate = update;
+            std::cout << "Detected file update: " << filename << std::endl;
+            refreshRequired = true;
+        }
     }
 }

@@ -56,6 +56,7 @@ public:
     std::string name;
     std::map<std::string, ObjectID> links;
     std::vector<ISceneObject*> pLinks;
+    bool refreshRequired = false;
 
 private:
     bool initialized = false;

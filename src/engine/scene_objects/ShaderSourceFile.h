@@ -1,6 +1,7 @@
 #ifndef HAZARD_SHADERSOURCEFILE_H
 #define HAZARD_SHADERSOURCEFILE_H
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -25,6 +26,10 @@ public:
     std::string filename;
     unsigned int shaderType = UNDEFINED;
     unsigned int shader     = 0;
+
+private:
+    [[noreturn]] void watchFileChanges();
+    std::filesystem::file_time_type lastFileUpdate;
 };
 
 // Macros for JSON (de)serialization.
