@@ -5,15 +5,13 @@
 
 #include "Camera.h"
 
-using namespace glm;
-
-Camera::Camera(vec3 position, vec3 front, vec3 right)
+Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 right)
     : position(position), front(front), right(right) {
     updateCameraVectors();
 }
 
-mat4 Camera::getViewMatrix() {
-    return lookAt(position, position + front, up);
+glm::mat4 Camera::getViewMatrix() {
+    return glm::lookAt(position, position + front, up);
 }
 
 void Camera::processKeyboardControl(GLFWwindow* window) {
@@ -64,8 +62,9 @@ void Camera::processMouseControl(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void Camera::updateCameraVectors() {
+    using glm::radians;
     // calculate the new Front vector
-    vec3 newFront;
+    glm::vec3 newFront;
     newFront.x = cos(radians(yaw)) * cos(radians(pitch));
     newFront.y = sin(radians(pitch));
     newFront.z = sin(radians(yaw)) * cos(radians(pitch));
@@ -75,4 +74,9 @@ void Camera::updateCameraVectors() {
         cross(front, worldUp)); // normalize the vectors, because their length gets closer to 0 the
                                 // more you look up or down which results in slower movement.
     up = normalize(cross(right, front));
+}
+
+void Camera::go(glm::vec3 coords) {
+    position = coords;
+    updateCameraVectors();
 }

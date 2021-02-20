@@ -31,9 +31,9 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
 void Scene::draw() {
     stats->refresh();
 
-    mat4 projection =
-        perspective(radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
-    mat4 view = camera->getViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                            (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
+    glm::mat4 view       = camera->getViewMatrix();
 
     for (auto& [id, obj] : objectsStorage) {
         if (obj->refreshRequired) {

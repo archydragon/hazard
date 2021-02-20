@@ -197,6 +197,11 @@ void UI::windowObjects() {
                 if (ImGui::Selectable("Properties", false)) {
                     showWindowProperties[id] = true;
                 }
+                // Special entry for drawables only.
+                auto obj = scene->getObjectByID<Drawable>(id);
+                if (obj && ImGui::Selectable("Move camera here", false)) {
+                    camera->go(obj->position);
+                }
                 if (ImGui::Selectable("Rename", false)) {
                     currentObjectID       = id;
                     showPopupRenameObject = true;

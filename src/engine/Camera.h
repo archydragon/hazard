@@ -5,27 +5,27 @@
 #include <glm/glm.hpp>
 #include <glm2json.h>
 
-using namespace glm;
-
 class Camera {
 public:
-    explicit Camera(vec3 position = vec3(-0.7f, 0.5f, 5.0f), vec3 front = vec3(1.0f, -1.0f, -1.5f),
-                    vec3 right = vec3(1, 0, 0));
-    mat4 getViewMatrix();
+    explicit Camera(glm::vec3 position = glm::vec3(-0.7f, 0.5f, 5.0f),
+                    glm::vec3 front    = glm::vec3(1.0f, -1.0f, -1.5f),
+                    glm::vec3 right    = glm::vec3(1, 0, 0));
+    glm::mat4 getViewMatrix();
     void processKeyboardControl(GLFWwindow* window);
     void processMouseControl(GLFWwindow* window, double xpos, double ypos);
     void updateCameraVectors();
+    void go(glm::vec3 coords);
 
-    vec3 position{};
-    vec3 front{};
+    glm::vec3 position{};
+    glm::vec3 front{};
 
     bool allowKeyboardControl = false;
     bool allowMouseControl    = false;
 
 private:
-    vec3 up{};
-    vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
-    vec3 right{};
+    glm::vec3 up{};
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 right{};
     // Euler angles.
     float yaw   = -90.0f;
     float pitch = 0.0f;
