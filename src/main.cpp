@@ -9,12 +9,12 @@
 #include "engine/Scene.h"
 #include "ui/UI.h"
 
+// Those are declared globally as those objects
 Config cfg;
+Camera camera;
 
 void GLAPIENTRY glMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
                                   GLsizei length, const GLchar* message, const void* userParam);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void window_maximize_callback(GLFWwindow* window, int maximized);
 
 int main() {
     // Load config.
@@ -48,8 +48,21 @@ int main() {
     // Enable vsync
     glfwSwapInterval(1);
 
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetWindowMaximizeCallback(window, window_maximize_callback);
+    // GLFW Calbacks.
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int fbwidth, int fbheight) {
+        glViewport(0, 0, fbwidth, fbheight);
+        cfg.saveWindowSize(fbwidth, fbheight);
+    });
+    glfwSetWindowMaximizeCallback(window, [](GLFWwindow* window, int maximized) {
+        if (maximized) {
+            cfg.saveWindowMaximizedState(true);
+        } else {
+            cfg.saveWindowMaximizedState(false);
+        }
+    });
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+        camera.processMouseControl(window, xoffset, yoffset);
+    });
 
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -71,9 +84,6 @@ int main() {
               << std::endl;
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    // Create camera.
-    Camera camera;
-
     // Create scene.
     Scene scene(cfg.sceneFile.c_str(), cfg.windowWidth, cfg.windowHeight, &camera);
 
@@ -82,6 +92,8 @@ int main() {
 
     // Main rendering loop.
     do {
+        camera.processKeyboardControl(window);
+
         ui.initFrame();
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -107,18 +119,5 @@ void GLAPIENTRY glMessageCallback(GLenum source, GLenum type, GLuint id, GLenum 
         std::cerr << "OpenGL error: type: 0x" << std::hex << type << std::dec
                   << " severity: " << std::hex << severity << std::dec << " - " << message
                   << std::endl;
-    }
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int fbwidth, int fbheight) {
-    glViewport(0, 0, fbwidth, fbheight);
-    cfg.saveWindowSize(fbwidth, fbheight);
-}
-
-void window_maximize_callback(GLFWwindow* window, int maximized) {
-    if (maximized) {
-        cfg.saveWindowMaximizedState(true);
-    } else {
-        cfg.saveWindowMaximizedState(false);
     }
 }

@@ -140,9 +140,14 @@ void UI::windowStats() {
 
 // Camera control window.
 void UI::windowCamera() {
-    if (newImGuiWindow("Camera", &showWindowCamera, 980, 26, 300, 128)) {
-        ImGui::DragFloat3("position", (float*)&camera->position, 0.05f, -20.0f, 20.0f, "%.2f");
-        ImGui::DragFloat3("front", (float*)&camera->front, 0.01f, -1.0f, 1.0f, "%.2f");
+    if (newImGuiWindow("Camera", &showWindowCamera, 980, 26, 320, 180)) {
+        if (ImGui::CollapsingHeader("Coordinates")) {
+            ImGui::DragFloat3("position", (float*)&camera->position, 0.05f, -20.0f, 20.0f, "%.2f");
+        }
+        ImGui::Dummy(ImVec2(0, 5.0f));
+        ImGui::Text("Move camera with:");
+        ImGui::Checkbox("WASD on keyboard", &camera->allowKeyboardControl);
+        ImGui::Checkbox("right mouse button dragging", &camera->allowMouseControl);
         ImGui::End();
     }
 }
