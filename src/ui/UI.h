@@ -18,8 +18,6 @@ public:
     void initFrame();
     static void draw();
 
-    bool cameraFreelook = false;
-
     static std::string dialogOpenFile(const char* key, const char* title, bool* show,
                                       const char* filters);
 

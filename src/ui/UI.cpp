@@ -141,9 +141,8 @@ void UI::windowStats() {
 // Camera control window.
 void UI::windowCamera() {
     if (newImGuiWindow("Camera", &showWindowCamera, 980, 26, 300, 128)) {
-        ImGui::Checkbox("Freelook", &cameraFreelook);
-        ImGui::SliderFloat3("position", (float*)&camera->position, -20.0f, 20.0f);
-        ImGui::SliderFloat3("front", (float*)&camera->front, -1.0f, 1.0f);
+        ImGui::DragFloat3("position", (float*)&camera->position, 0.05f, -20.0f, 20.0f, "%.2f");
+        ImGui::DragFloat3("front", (float*)&camera->front, 0.01f, -1.0f, 1.0f, "%.2f");
         ImGui::End();
     }
 }
