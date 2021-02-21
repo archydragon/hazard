@@ -3,17 +3,14 @@
 
 #include "Camera.h"
 #include "RenderStats.h"
-#include "scene_objects/Drawable.h"
 #include "scene_objects/ISceneObject.h"
-#include "scene_objects/ShaderProgram.h"
-#include "scene_objects/ShaderSourceFile.h"
-#include "scene_objects/Texture.h"
 
 class Scene {
 public:
     Scene(const char* filename, int screenWidth, int screenHeight, Camera* camera);
 
-    void draw();
+    void prerender();
+    void render();
     void save();
     void loadFromFile(const char* pFilename);
     static std::map<ObjectType, std::string> listObjectTypes();

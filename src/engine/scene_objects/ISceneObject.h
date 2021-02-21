@@ -15,6 +15,7 @@ enum ObjectType
     SHADER_PROGRAM     = 10,
     SHADER_SOURCE_FILE = 20,
     TEXTURE            = 30,
+    LIGHT_SOURCE       = 40,
     DRAWABLE           = 1000,
 };
 

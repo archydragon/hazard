@@ -1,3 +1,5 @@
+#include <glad/glad.h>
+
 #include "ShaderProgram.h"
 
 ShaderProgram::ShaderProgram() = default;

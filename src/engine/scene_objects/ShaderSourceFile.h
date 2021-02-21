@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 
-#include <glad/glad.h>
 #include <nlohmann/json.hpp>
 
 #include "ISceneObject.h"

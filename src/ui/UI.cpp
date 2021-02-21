@@ -76,7 +76,7 @@ void UI::initFrame() {
     }
 }
 
-void UI::draw() {
+void UI::render() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

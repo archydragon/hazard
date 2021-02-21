@@ -92,16 +92,21 @@ int main() {
 
     // Main rendering loop.
     do {
+        scene.stats->refresh();
+
+        scene.prerender();
+
         camera.processKeyboardControl(window);
 
         ui.initFrame();
 
+        glViewport(0, 0, cfg.windowWidth, cfg.windowHeight);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        scene.draw();
+        scene.render();
 
-        ui.draw();
+        ui.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -1,6 +1,8 @@
 #ifndef HAZARD_CUBE_H
 #define HAZARD_CUBE_H
 
+#include <glad/glad.h>
+
 #include "IDrawable.h"
 
 class Cube : public IDrawable {

@@ -1,5 +1,7 @@
 #include <thread>
 
+#include <glad/glad.h>
+
 #include "ShaderSourceFile.h"
 
 ShaderSourceFile::ShaderSourceFile() = default;

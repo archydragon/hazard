@@ -3,6 +3,7 @@
 #ifndef HAZARD_PROPERTIES_H
 #define HAZARD_PROPERTIES_H
 
+#include "../engine/scene_objects/LightSource.h"
 #include "../engine/scene_objects/ShaderProgram.h"
 #include "../engine/scene_objects/ShaderSourceFile.h"
 #include "fields.h"
@@ -68,6 +69,15 @@ template <> bool propertiesFields<Texture>(Texture* obj, Scene* scene) {
                         &obj->filename);
 }
 
+template <> bool propertiesFields<LightSource>(LightSource* obj, Scene* scene) {
+    std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
+    bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
+
+    bool pos = vec3Slider("position", -20, 20, &obj->id, &obj->position);
+    bool dir = vec3Slider("direction", -20, 20, &obj->id, &obj->direction);
+    return (sp || pos || dir);
+}
+
 template <class C> void properties(ObjectID id, Scene* scene) {
     if (propertiesFields<C>(scene->getObjectByID<C>(id), scene)) {
         scene->refreshObject(id);
@@ -89,6 +99,9 @@ void properties(ObjectID id, ObjectType type, Scene* scene) {
     }
     if (dynamic_cast<Texture*>(obj)) {
         properties<Texture>(id, scene);
+    }
+    if (dynamic_cast<LightSource*>(obj)) {
+        properties<LightSource>(id, scene);
     }
 }
 

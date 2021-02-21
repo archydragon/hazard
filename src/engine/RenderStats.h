@@ -1,6 +1,7 @@
 #ifndef HAZARD_RENDERSTATS_H
 #define HAZARD_RENDERSTATS_H
 
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 struct ScrollingBuffer {

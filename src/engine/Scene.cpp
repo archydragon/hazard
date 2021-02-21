@@ -3,13 +3,17 @@
 #include <map>
 #include <random>
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <nlohmann/json.hpp>
 
 #include "Camera.h"
 #include "Scene.h"
+#include "scene_objects/Drawable.h"
+#include "scene_objects/LightSource.h"
+#include "scene_objects/ShaderProgram.h"
+#include "scene_objects/ShaderSourceFile.h"
+#include "scene_objects/Texture.h"
 
 using nlohmann::json;
 
@@ -25,12 +29,27 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
         std::pair<ObjectType, std::string>(SHADER_SOURCE_FILE, "\xee\x81\x9f Shader source file"));
     types.insert(std::pair<ObjectType, std::string>(SHADER_PROGRAM, "\xee\x82\xbc Shader program"));
     types.insert(std::pair<ObjectType, std::string>(TEXTURE, "\xee\x81\xb5 Texture"));
+    types.insert(std::pair<ObjectType, std::string>(LIGHT_SOURCE, "\xee\x83\x8e Light source"));
     return types;
 }
 
-void Scene::draw() {
-    stats->refresh();
+void Scene::prerender() {
+    for (auto ls : objects<LightSource>()) {
+        ls->prepareDepthMap();
+        float near_plane = 1.0f, far_plane = 7.5f;
+        glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 view =
+            glm::lookAt(ls->position, ls->position + ls->direction, glm::vec3(0, 1, 0));
+        for (auto& o : objects<Drawable>()) {
+            glm::mat4 model = o->calculateModel();
+            ls->useShader(model, view, projection);
+            o->drawable->draw(projection, view);
+        }
+        ls->cleanup();
+    }
+}
 
+void Scene::render() {
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                             (float)screenWidth / (float)screenHeight, 0.1f, 200.0f);
     glm::mat4 view       = camera->getViewMatrix();
@@ -115,6 +134,10 @@ void Scene::load() {
                 pushObjectFromJSON<Texture>(it);
                 break;
             }
+            case LIGHT_SOURCE: {
+                pushObjectFromJSON<LightSource>(it);
+                break;
+            }
             }
             sortedObjectIDs.push_back(it["id"]);
         }
@@ -144,6 +167,9 @@ void Scene::save() {
         }
         if (dynamic_cast<Texture*>(o.get())) {
             j["objects"].push_back(*dynamic_cast<Texture*>(o.get()));
+        }
+        if (dynamic_cast<LightSource*>(o.get())) {
+            j["objects"].push_back(*dynamic_cast<LightSource*>(o.get()));
         }
     }
 
@@ -183,6 +209,10 @@ ObjectID Scene::createObject(int t, const char* name) {
     }
     case TEXTURE: {
         objectsStorage[newID] = (std::make_shared<Texture>(newID, name));
+        break;
+    }
+    case LIGHT_SOURCE: {
+        objectsStorage[newID] = (std::make_shared<LightSource>(newID, name));
         break;
     }
     default:

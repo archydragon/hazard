@@ -16,7 +16,7 @@ public:
     explicit UI(GLFWwindow* window, Config* config, Scene* scene, Camera* camera);
     virtual ~UI();
     void initFrame();
-    static void draw();
+    static void render();
 
     static std::string dialogOpenFile(const char* key, const char* title, bool* show,
                                       const char* filters);

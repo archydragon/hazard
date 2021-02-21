@@ -36,7 +36,21 @@ void Drawable::init() {
 }
 
 unsigned int Drawable::draw(glm::mat4 projection, glm::mat4 view) {
-    // Init.
+    glm::mat4 model = calculateModel();
+
+    if (!shader) {
+        return 0;
+    }
+
+    shader->use();
+    shader->setMat4("projection", projection);
+    shader->setMat4("view", view);
+    shader->setMat4("model", model);
+
+    return drawable->draw(projection, view);
+}
+
+glm::mat4 Drawable::calculateModel() const {
     glm::mat4 model = glm::mat4(1.0f);
 
     // Move.
@@ -54,15 +68,5 @@ unsigned int Drawable::draw(glm::mat4 projection, glm::mat4 view) {
 
     // Scale.
     model = glm::scale(model, glm::vec3(scale));
-
-    if (!shader) {
-        return 0;
-    }
-
-    shader->use();
-    shader->setMat4("projection", projection);
-    shader->setMat4("view", view);
-    shader->setMat4("model", model);
-
-    return drawable->draw(projection, view);
+    return model;
 }
