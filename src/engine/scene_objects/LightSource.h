@@ -17,7 +17,7 @@ public:
         return "\xee\x83\x8e";
     }
     void resolveLinks(const Objects& objs) override;
-    bool init() override;
+    void init() override;
     void prepareDepthMap() const;
     void useShader(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
     void cleanup();

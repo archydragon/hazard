@@ -6,13 +6,9 @@
 
 ShaderSourceFile::ShaderSourceFile() = default;
 
-bool ShaderSourceFile::init() {
-    if (ISceneObject::init()) {
-        return true;
-    }
-
+void ShaderSourceFile::init() {
     if (filename.empty()) {
-        return false;
+        return;
     }
 
     std::string content;
@@ -25,17 +21,19 @@ bool ShaderSourceFile::init() {
         std::stringstream stream;
         stream << file.rdbuf();
         file.close();
-        content = stream.str();
+        shaderCode = stream.str();
+        std::cout << "Shader file " << filename << " loaded." << std::endl;
     } catch (std::ifstream::failure& e) {
         std::cerr << "Failed to read shader file " << filename << std::endl;
-        return false;
     }
+}
 
-    const char* shaderCode = content.c_str();
-
+void ShaderSourceFile::compile() {
     // Compile shader.
+    const char* code = shaderCode.c_str();
+
     shader = glCreateShader(shaderType);
-    glShaderSource(shader, 1, &shaderCode, NULL);
+    glShaderSource(shader, 1, &code, NULL);
     glCompileShader(shader);
 
     // Check for errors.
@@ -45,17 +43,15 @@ bool ShaderSourceFile::init() {
     if (!success) {
         glGetShaderInfoLog(shader, 4096, NULL, log);
         std::cerr << "Failed to compile shader." << std::endl
-                  << "Source file: " << filename << std::endl
+                  << "Source file: " << this->filename << std::endl
                   << "Error log:" << std::endl
                   << log << std::endl;
     } else {
-        std::cout << "Shader file " << filename << " loaded and compiled." << std::endl;
+        std::cout << "Shader file " << filename << " compiled." << std::endl;
         lastFileUpdate = std::filesystem::last_write_time(filename.c_str());
         std::thread watcher(&ShaderSourceFile::watchFileChanges, this);
         watcher.detach();
     }
-
-    return true;
 }
 
 [[noreturn]] void ShaderSourceFile::watchFileChanges() {

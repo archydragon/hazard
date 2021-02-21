@@ -68,6 +68,7 @@ private:
     void resolveAndInit();
     void rebuildAncestors();
     void sortIDs();
+    void buildInitOrder(std::vector<ObjectID>& initOrder, ISceneObject* obj);
 };
 
 #endif // HAZARD_SCENE_H

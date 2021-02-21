@@ -8,11 +8,7 @@
 
 Texture::Texture() = default;
 
-bool Texture::init() {
-    if (ISceneObject::init()) {
-        return true;
-    }
-
+void Texture::init() {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID); // all upcoming GL_TEXTURE_2D operations now have
                                              // effect on this texture object
@@ -42,5 +38,4 @@ bool Texture::init() {
     stbi_image_free(texData);
 
     std::cout << "Texture file " << filename << " loaded." << std::endl;
-    return true;
 }

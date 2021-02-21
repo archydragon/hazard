@@ -19,7 +19,8 @@ public:
     const char* icon() override {
         return "\xee\x81\x9f";
     }
-    bool init() override;
+    void init() override;
+    void compile();
     ObjectType type = SHADER_SOURCE_FILE;
 
     std::string filename;
@@ -29,6 +30,7 @@ public:
 private:
     [[noreturn]] void watchFileChanges();
     std::filesystem::file_time_type lastFileUpdate;
+    std::string shaderCode = "";
 };
 
 // Macros for JSON (de)serialization.

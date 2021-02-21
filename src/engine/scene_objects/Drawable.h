@@ -17,7 +17,7 @@ public:
     Drawable() = default;
     Drawable(ObjectID id, const char* name);
     void resolveLinks(const Objects& objs) override;
-    bool init() override;
+    void init() override;
     unsigned int draw(glm::mat4 projection, glm::mat4 view);
 
     static std::map<DrawableType, std::string> listObjectTypes();

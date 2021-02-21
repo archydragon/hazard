@@ -73,13 +73,38 @@ void Scene::resolveAndInit() {
             o->resolveLinks(objectsStorage);
         }
     }
+    rebuildAncestors();
 
+    std::vector<ObjectID> initOrder;
     for (auto [id, o] : objectsStorage) {
-        o->init();
+        buildInitOrder(initOrder, o.get());
+    }
+
+    for (ObjectID id : initOrder) {
+        objectsStorage[id]->init();
     }
 
     sortIDs();
-    rebuildAncestors();
+}
+
+// Recursive function to traverse objects tree and build initialization order based on that.
+// Not really optimal but works so far.
+void Scene::buildInitOrder(std::vector<ObjectID>& initOrder, ISceneObject* obj) {
+    // Skip already added items.
+    for (auto id : initOrder) {
+        if (id == obj->id) {
+            return;
+        }
+    }
+
+    // If object has links, process them recursively.
+    if (!obj->links.empty()) {
+        for (auto link : obj->pLinks) {
+            buildInitOrder(initOrder, link);
+        }
+    }
+    // Add parent object itself in the end.
+    initOrder.push_back(obj->id);
 }
 
 void Scene::rebuildAncestors() {
@@ -273,6 +298,9 @@ void Scene::refreshObject(ObjectID id, bool needRebuild) {
 
     // Re-initialize object and its ancestors.
     obj->init();
+    if (ancestors.find(id) == ancestors.end()) {
+        return;
+    }
     for (auto a : ancestors[id]) {
         a->init();
     }

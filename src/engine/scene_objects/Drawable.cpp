@@ -21,11 +21,7 @@ void Drawable::resolveLinks(const Objects& objs) {
     }
 }
 
-bool Drawable::init() {
-    if (ISceneObject::init()) {
-        return true;
-    }
-
+void Drawable::init() {
     switch (drawableType) {
     case CUBE:
         drawable = std::make_unique<Cube>();
@@ -36,8 +32,6 @@ bool Drawable::init() {
     }
     drawable->init();
     std::cout << "Drawable object created." << std::endl;
-
-    return true;
 }
 
 unsigned int Drawable::draw(glm::mat4 projection, glm::mat4 view) {

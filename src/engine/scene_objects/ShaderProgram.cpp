@@ -32,15 +32,21 @@ void ShaderProgram::resolveLinks(const Objects& objs) {
     }
 }
 
-bool ShaderProgram::init() {
-    if (ISceneObject::init()) {
-        return true;
-    }
-
+void ShaderProgram::init() {
     // Don't try to init if shaders are not resolved and compiled.
     if (vertexShader == nullptr || fragmentShader == nullptr) {
-        return false;
+        return;
     }
+
+    // Delete old program.
+    if (programID > 0) {
+        glDeleteProgram(programID);
+        programID = 0;
+    }
+
+    // Compile shaders.
+    vertexShader->compile();
+    fragmentShader->compile();
 
     // Attach shaders and link shader program.
     programID = glCreateProgram();
@@ -51,9 +57,9 @@ bool ShaderProgram::init() {
     // Check for errors.
     char log[4096];
     int success;
-    glGetShaderiv(programID, GL_COMPILE_STATUS, &success);
+    glGetProgramiv(programID, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetShaderInfoLog(this->programID, 4096, NULL, log);
+        glGetProgramInfoLog(programID, 4096, NULL, log);
         std::cerr << "Failed to link shader program." << std::endl
                   << "Error log:" << std::endl
                   << log << std::endl;
@@ -61,8 +67,6 @@ bool ShaderProgram::init() {
         std::cout << "Shader linked successfully." << std::endl;
         retrieveUniforms();
     }
-
-    return true;
 }
 
 void ShaderProgram::use() const {
