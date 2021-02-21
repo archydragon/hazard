@@ -18,8 +18,10 @@ void LightSource::resolveLinks(const Objects& objs) {
     }
 }
 
-void LightSource::init() {
-    ISceneObject::init();
+bool LightSource::init() {
+    if (ISceneObject::init()) {
+        return true;
+    }
 
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthMap);
@@ -36,6 +38,8 @@ void LightSource::init() {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return true;
 }
 
 void LightSource::prepareDepthMap() const {

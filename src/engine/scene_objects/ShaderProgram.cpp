@@ -32,12 +32,14 @@ void ShaderProgram::resolveLinks(const Objects& objs) {
     }
 }
 
-void ShaderProgram::init() {
-    ISceneObject::init();
+bool ShaderProgram::init() {
+    if (ISceneObject::init()) {
+        return true;
+    }
 
     // Don't try to init if shaders are not resolved and compiled.
     if (vertexShader == nullptr || fragmentShader == nullptr) {
-        return;
+        return false;
     }
 
     // Attach shaders and link shader program.
@@ -59,6 +61,8 @@ void ShaderProgram::init() {
         std::cout << "Shader linked successfully." << std::endl;
         retrieveUniforms();
     }
+
+    return true;
 }
 
 void ShaderProgram::use() const {

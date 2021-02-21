@@ -19,7 +19,7 @@ public:
     const char* icon() override {
         return "\xee\x81\x9f";
     }
-    void init() override;
+    bool init() override;
     ObjectType type = SHADER_SOURCE_FILE;
 
     std::string filename;

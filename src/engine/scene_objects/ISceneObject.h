@@ -29,16 +29,11 @@ public:
     };
     // Need those predefined initializer and resolver for correct initialization order for linked
     // objects.
-    virtual void init() {
-        if (initialized) {
-            return;
-        } else {
-            initialized = true;
-        }
-
+    virtual bool init() {
         for (auto& o : pLinks) {
-            o->init();
+            o->initialized = o->init();
         }
+        return initialized;
     };
     virtual void resolveLinks(const std::map<ObjectID, std::shared_ptr<ISceneObject>>& objs) {
         for (auto& [_, id] : links) {
@@ -59,7 +54,7 @@ public:
     std::vector<ISceneObject*> pLinks;
     bool refreshRequired = false;
 
-private:
+protected:
     bool initialized = false;
 };
 

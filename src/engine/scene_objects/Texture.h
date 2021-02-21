@@ -13,7 +13,7 @@ public:
     const char* icon() override {
         return "\xee\x81\xb5";
     }
-    void init() override;
+    bool init() override;
     ObjectType type = TEXTURE;
 
     std::string filename;

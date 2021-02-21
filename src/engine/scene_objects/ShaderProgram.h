@@ -25,7 +25,7 @@ public:
         return "\xee\x82\xbc";
     }
     void resolveLinks(const Objects& objs) override;
-    void init() override;
+    bool init() override;
     void use() const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
     void setInt(const std::string& name, int value) const;

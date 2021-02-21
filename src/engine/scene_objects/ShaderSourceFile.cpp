@@ -6,8 +6,14 @@
 
 ShaderSourceFile::ShaderSourceFile() = default;
 
-void ShaderSourceFile::init() {
-    ISceneObject::init();
+bool ShaderSourceFile::init() {
+    if (ISceneObject::init()) {
+        return true;
+    }
+
+    if (filename.empty()) {
+        return false;
+    }
 
     std::string content;
     std::ifstream file;
@@ -22,7 +28,7 @@ void ShaderSourceFile::init() {
         content = stream.str();
     } catch (std::ifstream::failure& e) {
         std::cerr << "Failed to read shader file " << filename << std::endl;
-        return;
+        return false;
     }
 
     const char* shaderCode = content.c_str();
@@ -43,11 +49,13 @@ void ShaderSourceFile::init() {
                   << "Error log:" << std::endl
                   << log << std::endl;
     } else {
-        std::cout << "Shader " << filename << " loaded and compiled." << std::endl;
+        std::cout << "Shader file " << filename << " loaded and compiled." << std::endl;
         lastFileUpdate = std::filesystem::last_write_time(filename.c_str());
         std::thread watcher(&ShaderSourceFile::watchFileChanges, this);
         watcher.detach();
     }
+
+    return true;
 }
 
 [[noreturn]] void ShaderSourceFile::watchFileChanges() {
