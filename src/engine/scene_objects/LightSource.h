@@ -28,11 +28,12 @@ public:
     glm::vec3 direction = glm::vec3(1, 0, -1);
 
     const unsigned int shadowMapSize = 1024;
+    glm::mat4 lightSpace;
+    unsigned int depthMap = 0;
 
 private:
     ShaderProgram* shader    = nullptr;
     unsigned int depthMapFBO = 0;
-    unsigned int depthMap    = 0;
 };
 
 // Macros for JSON (de)serialization.

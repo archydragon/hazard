@@ -36,7 +36,7 @@ std::map<ObjectType, std::string> Scene::listObjectTypes() {
 void Scene::prerender() {
     for (auto ls : objects<LightSource>()) {
         ls->prepareDepthMap();
-        float near_plane = 1.0f, far_plane = 7.5f;
+        float near_plane = 1.0f, far_plane = 100.0f;
         glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 view =
             glm::lookAt(ls->position, ls->position + ls->direction, glm::vec3(0, 1, 0));

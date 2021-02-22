@@ -19,8 +19,12 @@ void LightSource::resolveLinks(const Objects& objs) {
 }
 
 void LightSource::init() {
-    glGenFramebuffers(1, &depthMapFBO);
-    glGenTextures(1, &depthMap);
+    if (depthMapFBO == 0) {
+        glGenFramebuffers(1, &depthMapFBO);
+    }
+    if (depthMap == 0) {
+        glGenTextures(1, &depthMap);
+    }
     glBindTexture(GL_TEXTURE_2D, depthMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowMapSize, shadowMapSize, 0,
                  GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -47,6 +51,8 @@ void LightSource::useShader(glm::mat4 model, glm::mat4 view, glm::mat4 projectio
     shader->setMat4("projection", projection);
     shader->setMat4("view", view);
     shader->setMat4("model", model);
+
+    lightSpace = projection * view;
 }
 
 void LightSource::cleanup() {

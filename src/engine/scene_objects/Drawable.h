@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "ISceneObject.h"
+#include "LightSource.h"
 #include "ShaderProgram.h"
 #include "drawables/Cube.h"
 #include "drawables/IDrawable.h"
@@ -40,7 +41,8 @@ public:
     glm::vec3 rotation = glm::vec3(0.0f);
 
 private:
-    ShaderProgram* shader = nullptr;
+    ShaderProgram* shader    = nullptr;
+    LightSource* lightSource = nullptr;
 };
 
 // Macros for JSON (de)serialization.

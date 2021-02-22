@@ -55,12 +55,16 @@ template <> bool propertiesFields<Drawable>(Drawable* obj, Scene* scene) {
 
     bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
 
+    links = scene->getObjectsNames<LightSource>();
+
+    bool ls = linkedObjectSelector("Light source", &obj->id, &obj->links["lightSourceID"], links);
+
     bool scaled = floatSlider("scale", 0.0f, 50.0f, &obj->id, &obj->scale);
 
     bool moved   = vec3Slider("move", -20, 20, &obj->id, &obj->position);
     bool rotated = vec3Slider("rotate", 0, 360, &obj->id, &obj->rotation);
 
-    return (scaled || sp || moved || rotated);
+    return (scaled || sp || ls || moved || rotated);
 }
 
 template <> bool propertiesFields<Texture>(Texture* obj, Scene* scene) {
@@ -71,7 +75,8 @@ template <> bool propertiesFields<Texture>(Texture* obj, Scene* scene) {
 
 template <> bool propertiesFields<LightSource>(LightSource* obj, Scene* scene) {
     std::map<ObjectID, std::string> links = scene->getObjectsNames<ShaderProgram>();
-    bool sp = linkedObjectSelector("Shader", &obj->id, &obj->links["shaderProgramID"], links);
+    bool sp =
+        linkedObjectSelector("Depth map shader", &obj->id, &obj->links["shaderProgramID"], links);
 
     bool pos = vec3Slider("position", -20, 20, &obj->id, &obj->position);
     bool dir = vec3Slider("direction", -20, 20, &obj->id, &obj->direction);

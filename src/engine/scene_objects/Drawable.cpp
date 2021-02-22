@@ -2,6 +2,7 @@
 
 Drawable::Drawable(ObjectID id, const char* name) : ISceneObject(id, name) {
     registerLinkName("shaderProgramID");
+    registerLinkName("lightSourceID");
 }
 
 std::map<DrawableType, std::string> Drawable::listObjectTypes() {
@@ -19,6 +20,11 @@ void Drawable::resolveLinks(const Objects& objs) {
     } else {
         shader = nullptr;
     }
+    if (links["lightSourceID"] > 0) {
+        lightSource = (LightSource*)objs.at(links["lightSourceID"]).get();
+    } else {
+        lightSource = nullptr;
+    }
 }
 
 void Drawable::init() {
@@ -31,7 +37,6 @@ void Drawable::init() {
         break;
     }
     drawable->init();
-    std::cout << "Drawable object created." << std::endl;
 }
 
 unsigned int Drawable::draw(glm::mat4 projection, glm::mat4 view) {
@@ -45,6 +50,16 @@ unsigned int Drawable::draw(glm::mat4 projection, glm::mat4 view) {
     shader->setMat4("projection", projection);
     shader->setMat4("view", view);
     shader->setMat4("model", model);
+
+    if (lightSource) {
+        shader->setMat4("lightSpaceMatrix", lightSource->lightSpace);
+        shader->setVec3("lightPos", lightSource->position);
+        shader->setVec3("lightDir", lightSource->direction);
+
+        glActiveTexture(GL_TEXTURE0 + lightSource->depthMap);
+        shader->setInt("depthmap", lightSource->depthMap);
+        glBindTexture(GL_TEXTURE_2D, lightSource->depthMap);
+    }
 
     return drawable->draw(projection, view);
 }
