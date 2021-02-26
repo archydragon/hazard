@@ -61,6 +61,7 @@ void UI::initFrame() {
         windowCamera();
         windowObjects();
         windowStats();
+        windowTexturePreview();
         // Properties windows.
         windowsProperties();
 
@@ -99,6 +100,7 @@ void UI::mainMenu() {
             ImGui::Checkbox("Objects", &showWindowObjects);
             ImGui::Checkbox("Camera", &showWindowCamera);
             ImGui::Checkbox("Stats", &showWindowStats);
+            ImGui::Checkbox("Texture preview", &showWindowTexturePreview);
             ImGui::EndMenu();
         }
 
@@ -213,6 +215,42 @@ void UI::windowObjects() {
                 ImGui::EndPopup();
             }
         }
+
+        ImGui::End();
+    }
+}
+
+// Texture previewing window, used mostly for debugging purposes.
+void UI::windowTexturePreview() {
+    if (newImGuiWindow("Texture preview", &showWindowTexturePreview, 50, 50, 600, 600)) {
+        ImGui::Text("Texture ID:");
+        ImGui::SameLine();
+        ImGui::PushItemWidth(120);
+
+        if (ImGui::BeginCombo("##textureID", std::to_string(selectedTexture).c_str())) {
+            for (unsigned int id = 0; id < 8; id++) {
+                bool is_selected;
+                is_selected = selectedTexture && (selectedTexture == id);
+                if (ImGui::Selectable(std::to_string(id).c_str(), is_selected)) {
+                    selectedTexture = id;
+                }
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::PopItemWidth();
+
+        // Draw the texture but keep proportions and fit it inside the window.
+        // Assume that all the textures we care of here are square ones.
+        ImVec2 wSize = ImGui::GetContentRegionAvail();
+        if (wSize.x < wSize.y) {
+            wSize.y = wSize.x;
+        } else {
+            wSize.x = wSize.y;
+        }
+        ImGui::Image((void*)(intptr_t)selectedTexture, wSize);
 
         ImGui::End();
     }

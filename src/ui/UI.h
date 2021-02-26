@@ -33,6 +33,7 @@ private:
     void windowObjects();
     void windowCamera();
     void windowStats();
+    void windowTexturePreview();
     void windowsProperties();
     void dialogOpenScene();
     void popupNewObject();
@@ -40,9 +41,10 @@ private:
     void popupDeleteObject();
 
     // Windows and dialogs display states.
-    bool showWindowCamera  = true;
-    bool showWindowObjects = true;
-    bool showWindowStats   = true;
+    bool showWindowCamera         = true;
+    bool showWindowObjects        = true;
+    bool showWindowStats          = true;
+    bool showWindowTexturePreview = false;
     std::map<ObjectID, bool> showWindowProperties;
     bool showDialogOpenScene   = false;
     bool showPopupNewObject    = false;
@@ -52,6 +54,8 @@ private:
     int newObjectType = 0;
     std::string newObjectTypeName;
     ObjectID currentObjectID;
+
+    unsigned int selectedTexture = 0;
 
     void updateWindowTitle();
     static bool newImGuiWindow(const char* name, bool* p_open, float posX, float posY, float sizeX,

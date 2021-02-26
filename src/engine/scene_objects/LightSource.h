@@ -27,7 +27,7 @@ public:
     glm::vec3 position  = glm::vec3(0, 0, 0);
     glm::vec3 direction = glm::vec3(1, 0, -1);
 
-    const unsigned int shadowMapSize = 1024;
+    const unsigned int shadowMapSize = 4096;
     glm::mat4 lightSpace;
     unsigned int depthMap = 0;
 
