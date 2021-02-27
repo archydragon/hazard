@@ -71,6 +71,7 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     // OpenGL debug logs.
     glEnable(GL_DEBUG_OUTPUT);

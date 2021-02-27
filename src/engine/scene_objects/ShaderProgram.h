@@ -40,6 +40,7 @@ private:
     ShaderSourceFile* vertexShader   = nullptr;
     ShaderSourceFile* fragmentShader = nullptr;
     Texture* textureDiffuse          = nullptr;
+    Texture* textureNormal           = nullptr;
 
     void retrieveUniforms();
 };

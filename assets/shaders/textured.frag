@@ -7,6 +7,7 @@ in vec2 TexCoords;
 in vec4 FragPosLightSpace;
 
 uniform sampler2D texture_diffuse;
+uniform sampler2D texture_normal;
 uniform sampler2D depthmap;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -43,8 +44,10 @@ void main()
     // ambient
     vec3 ambient = 0.1 * color;
 
+    vec3 norm = texture(texture_normal, TexCoords).rgb;
+    norm = normalize(norm * 2.0 - 1.0);
+
     // diffuse
-    vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPos - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = 2 * diff * texture(texture_diffuse, TexCoords).rgb;

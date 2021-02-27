@@ -8,6 +8,7 @@ ShaderProgram::ShaderProgram(ObjectID id, const char* name) : ISceneObject(id, n
     registerLinkName("vertexShaderFileID");
     registerLinkName("fragmentShaderFileID");
     registerLinkName("textureID");
+    registerLinkName("normalMapID");
 }
 
 void ShaderProgram::resolveLinks(const Objects& objs) {
@@ -29,6 +30,11 @@ void ShaderProgram::resolveLinks(const Objects& objs) {
         textureDiffuse = (Texture*)objs.at(links["textureID"]).get();
     } else {
         textureDiffuse = nullptr;
+    }
+    if (links["normalMapID"] > 0) {
+        textureNormal = (Texture*)objs.at(links["normalMapID"]).get();
+    } else {
+        textureNormal = nullptr;
     }
 }
 
@@ -80,6 +86,11 @@ void ShaderProgram::use() const {
         glActiveTexture(GL_TEXTURE0 + textureDiffuse->textureID);
         setInt("texture_diffuse", textureDiffuse->textureID);
         glBindTexture(GL_TEXTURE_2D, textureDiffuse->textureID);
+    }
+    if (textureNormal) {
+        glActiveTexture(GL_TEXTURE0 + textureNormal->textureID);
+        setInt("texture_normal", textureNormal->textureID);
+        glBindTexture(GL_TEXTURE_2D, textureNormal->textureID);
     }
 }
 
